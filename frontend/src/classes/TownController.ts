@@ -10,6 +10,7 @@ import Interactable from '../components/Town/Interactable';
 import ConversationArea from '../components/Town/interactables/ConversationArea';
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
+import YTViewingArea from '../components/Town/interactables/YTViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
@@ -26,6 +27,7 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  YTViewingArea as YTViewingAreaModel,
 } from '../types/CoveyTownSocket';
 import {
   isConnectFourArea,
@@ -42,6 +44,7 @@ import InteractableAreaController, {
 } from './interactable/InteractableAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
+import YTViewingAreaController from './interactable/YTViewingAreaController';
 import PlayerController from './PlayerController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
@@ -583,6 +586,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Create a new viewing area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new viewing area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+  async createYTViewingArea(newArea: Omit<YTViewingAreaModel, 'type'>) {
+    await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
+  }
+
+  /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
    */
@@ -645,12 +659,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Retrieve the viewing area controller that corresponds to a viewingAreaModel, creating one if necessary
+   * Retrieve the viewing area controller that corresponds to a viewingAreaModel or ytviewingAreaModel, creating one if necessary
    *
    * @param viewingArea
    * @returns
    */
-  public getViewingAreaController(viewingArea: ViewingArea): ViewingAreaController {
+  public getViewingAreaController(
+    viewingArea: ViewingArea | YTViewingArea,
+  ): ViewingAreaController | YTViewingAreaController {
     const existingController = this._interactableControllers.find(
       eachExistingArea => eachExistingArea.id === viewingArea.name,
     );
@@ -699,7 +715,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param viewingArea The Viewing Area Controller that is updated and should be emitted
    *    with the event
    */
-  public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
+  public emitViewingAreaUpdate(viewingArea: ViewingAreaController | YTViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
   }
 

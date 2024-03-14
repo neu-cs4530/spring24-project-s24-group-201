@@ -20,6 +20,7 @@ export type GenericInteractableAreaController = InteractableAreaController<
 
 export const CONVERSATION_AREA_TYPE = 'Conversation Area';
 export const VIEWING_AREA_TYPE = 'Viewing Area';
+export const YTVIEWING_AREA_TYPE = 'YTViewing Area';
 export const GAME_AREA_TYPE = 'Game Area';
 /**
  * A InteractableAreaController manages the local behavior of a interactable area in the frontend,

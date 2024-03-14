@@ -15,9 +15,14 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: TypedInteractable[];
-}
+};
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType =
+  | 'ConversationArea'
+  | 'ViewingArea'
+  | 'YTViewingArea'
+  | 'TicTacToeArea'
+  | 'ConnectFourArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -27,7 +32,7 @@ export interface Interactable {
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-}
+};
 
 export type Direction = 'front' | 'back' | 'left' | 'right';
 
@@ -36,9 +41,9 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-};
+}
 
-export type XY = { x: number, y: number };
+export type XY = { x: number; y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -49,7 +54,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-};
+}
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -60,18 +65,26 @@ export type ChatMessage = {
 
 export interface ConversationArea extends Interactable {
   topic?: string;
-};
+}
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-};
+}
 
 export interface ViewingArea extends Interactable {
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
+}
+
+export interface YTViewingArea extends Interactable {
+  video?: string;
+  isPlaying: boolean;
+  elapsedTimeSec: number;
+  queue: string[];
+  like: boolean;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
@@ -80,7 +93,7 @@ export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_
  */
 export interface GameState {
   status: GameStatus;
-} 
+}
 
 /**
  * Type for the state of a game that can be won
@@ -216,10 +229,21 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
-export interface ViewingAreaUpdateCommand  {
+export type InteractableCommand =
+  | ViewingAreaUpdateCommand
+  | YTViewingAreaUpdateCommand
+  | JoinGameCommand
+  | GameMoveCommand<TicTacToeMove>
+  | GameMoveCommand<ConnectFourMove>
+  | StartGameCommand
+  | LeaveGameCommand;
+export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
+}
+export interface YTViewingAreaUpdateCommand {
+  type: 'YTViewingAreaUpdate';
+  update: YTViewingArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
@@ -237,19 +261,25 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
-export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
-  CommandType extends JoinGameCommand ? { gameID: string}:
-  CommandType extends ViewingAreaUpdateCommand ? undefined :
-  CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
-  CommandType extends LeaveGameCommand ? undefined :
-  never;
+export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
+  CommandType extends JoinGameCommand
+    ? { gameID: string }
+    : CommandType extends ViewingAreaUpdateCommand
+    ? undefined
+    : CommandType extends YTViewingAreaUpdateCommand
+    ? undefined
+    : CommandType extends GameMoveCommand<TicTacToeMove>
+    ? undefined
+    : CommandType extends LeaveGameCommand
+    ? undefined
+    : never;
 
 export type InteractableCommandResponse<MessageType> = {
   commandID: CommandID;
   interactableID: InteractableID;
   error?: string;
   payload?: InteractableCommandResponseMap[MessageType];
-}
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
