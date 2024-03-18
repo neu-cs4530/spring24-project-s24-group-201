@@ -1,3 +1,4 @@
+
 import { Container } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 //import ReactPlayer from 'react-player';
@@ -35,42 +36,42 @@ import YouTubeSearch from './YouTube/YouTubeSearch';
  * @param props: A single property 'controller', which is the ViewingAreaController corresponding to the
  *               current viewing area.
  */
-export function ViewingAreaVideo({
-  controller,
-}: {
-  controller: ViewingAreaController;
-}): JSX.Element {
-  const [videoUrl, setVideoUrl] = useState<string | undefined>(controller.video);
+// export function ViewingAreaVideo({
+//   controller,
+// }: {
+//   controller: ViewingAreaController;
+// }): JSX.Element {
+//   const [videoUrl, setVideoUrl] = useState<string | undefined>(controller.video);
 
-  useEffect(() => {
-    const handleVideoChange = (newVideoUrl: string | undefined) => {
-      setVideoUrl(newVideoUrl);
-    };
-    controller.addListener('videoChange', handleVideoChange);
-    return () => {
-      controller.removeListener('videoChange', handleVideoChange);
-    };
-  }, [controller]);
-
-  return (
-    <Container className='participant-wrapper'>
-      Viewing Area: {controller.friendlyName}{' '}
-      {videoUrl && <VideoRenderer videoId={videoUrl.split('v=')[1]} />}
-    </Container>
-  );
-}
-
-// export function ViewingAreaVideo(): JSX.Element {
-//   // Hardcoded video URL (extract the video ID from the URL)
-//   const videoId = 'dQw4w9WgXcQ';
+//   useEffect(() => {
+//     const handleVideoChange = (newVideoUrl: string | undefined) => {
+//       setVideoUrl(newVideoUrl);
+//     };
+//     controller.addListener('videoChange', handleVideoChange);
+//     return () => {
+//       controller.removeListener('videoChange', handleVideoChange);
+//     };
+//   }, [controller]);
 
 //   return (
-//     <div className='participant-wrapper'>
-//       Viewing Area Video:
-//       <VideoRenderer videoId={videoId} />
-//     </div>
+//     <Container className='participant-wrapper'>
+//       Viewing Area: {controller.friendlyName}{' '}
+//       {videoUrl && <VideoRenderer videoId={videoUrl.split('v=')[1]} />}
+//     </Container>
 //   );
 // }
+
+export function ViewingAreaVideo(): JSX.Element {
+  // Hardcoded video URL (extract the video ID from the URL)
+  const videoId = 'dQw4w9WgXcQ';
+
+  return (
+    <div className='participant-wrapper'>
+      Viewing Area Video:
+      <VideoRenderer videoId={videoId} />
+    </div>
+  );
+}
 
 /**
  * The ViewingArea monitors the player's interaction with a ViewingArea on the map: displaying either
@@ -78,71 +79,95 @@ export function ViewingAreaVideo({
  *
  * @param props: the viewing area interactable that is being interacted with
  */
-export function ViewingArea({
-  viewingArea,
-}: {
-  viewingArea: ViewingAreaInteractable;
-}): JSX.Element {
-  const townController = useTownController();
-  const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
-    viewingArea.name,
-  );
-  const [selectIsOpen, setSelectIsOpen] = useState(viewingAreaController.video === undefined);
-  const [viewingAreaVideoURL, setViewingAreaVideoURL] = useState(viewingAreaController.video);
-  useEffect(() => {
-    const setURL = (url: string | undefined) => {
-      if (!url) {
-        townController.interactableEmitter.emit('endIteraction', viewingAreaController);
-      } else {
-        setViewingAreaVideoURL(url);
-      }
-    };
-    viewingAreaController.addListener('videoChange', setURL);
-    return () => {
-      viewingAreaController.removeListener('videoChange', setURL);
-    };
-  }, [viewingAreaController, townController]);
-
-  if (!viewingAreaVideoURL) {
-    return (
-      <SelectVideoModal
-        isOpen={selectIsOpen}
-        close={() => {
-          setSelectIsOpen(false);
-          // forces game to emit "viewingArea" event again so that
-          // repoening the modal works as expected
-          townController.interactEnd(viewingArea);
-        }}
-        viewingArea={viewingArea}
-      />
-    );
-  }
-  return (
-    <>
-      <ViewingAreaVideo controller={viewingAreaController} />
-    </>
-  );
-}
-
 // export function ViewingArea({
 //   viewingArea,
 // }: {
 //   viewingArea: ViewingAreaInteractable;
 // }): JSX.Element {
-//   // You can still use the controller if you need to perform actions or checks based on the viewing area state
 //   const townController = useTownController();
 //   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
 //     viewingArea.name,
 //   );
+//   const [selectIsOpen, setSelectIsOpen] = useState(viewingAreaController.video === undefined);
+//   const [viewingAreaVideoURL, setViewingAreaVideoURL] = useState(viewingAreaController.video);
+//   useEffect(() => {
+//     const setURL = (url: string | undefined) => {
+//       if (!url) {
+//         townController.interactableEmitter.emit('endIteraction', viewingAreaController);
+//       } else {
+//         setViewingAreaVideoURL(url);
+//       }
+//     };
+//     viewingAreaController.addListener('videoChange', setURL);
+//     return () => {
+//       viewingAreaController.removeListener('videoChange', setURL);
+//     };
+//   }, [viewingAreaController, townController]);
 
-//   // Directly return the ViewingAreaVideo component, assuming that the interaction implies wanting to see the video
-//   return <ViewingAreaVideo />;
+//   if (!viewingAreaVideoURL) {
+//     return (
+//       <SelectVideoModal
+//         isOpen={selectIsOpen}
+//         close={() => {
+//           setSelectIsOpen(false);
+//           // forces game to emit "viewingArea" event again so that
+//           // repoening the modal works as expected
+//           townController.interactEnd(viewingArea);
+//         }}
+//         viewingArea={viewingArea}
+//       />
+//     );
+//   }
+//   return (
+//     <>
+//       <ViewingAreaVideo controller={viewingAreaController} />
+//     </>
+//   );
 // }
+
+export function ViewingArea({
+  viewingArea,
+}: {
+  viewingArea: ViewingAreaInteractable;
+}): JSX.Element {
+  // You can still use the controller if you need to perform actions or checks based on the viewing area state
+  const townController = useTownController();
+  const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
+    viewingArea.name,
+  );
+
+  // Directly return the ViewingAreaVideo component, assuming that the interaction implies wanting to see the video
+  return <ViewingAreaVideo />;
+}
 
 /**
  * The ViewingAreaWrapper is suitable to be *always* rendered inside of a town, and
  * will activate only if the player begins interacting with a viewing area.
  */
+export default function ViewingAreaWrapper(): JSX.Element {
+  const townController = useTownController();
+  const viewingArea = useInteractable<ViewingAreaInteractable>('viewingArea');
+
+  // Directly return the ViewingAreaVideo component if a viewing area is interacted with.
+  // You can either pass a hardcoded videoId to ViewingAreaVideo or make the videoId part
+  // of the ViewingAreaVideo component's implementation as shown previously.
+  if (viewingArea) {
+    // If you needed to perform any actions with the viewingAreaController, you could still
+    // retrieve it here, but for directly rendering a video, it might not be necessary.
+    return <ViewingAreaVideo />;
+  }
+
+  // When no viewing area is interacted with, render nothing or some placeholder
+  return <></>;
+}
+
+// Use the below code if you want to use YouTube Search, but comment out the ViewingAreaWrapper above.
+
+/**
+ * The ViewingAreaWrapper is suitable to be *always* rendered inside of a town, and
+ * will activate only if the player begins interacting with a viewing area.
+ */
+/** 
 export default function ViewingAreaWrapper(): JSX.Element {
   const [videoId, setVideoId] = useState<string | undefined>(undefined);
   const townController = useTownController();
@@ -174,4 +199,8 @@ export default function ViewingAreaWrapper(): JSX.Element {
   return <></>;
 }
 
+*/
+
 //make whole page a parent, multiple child components
+
+
