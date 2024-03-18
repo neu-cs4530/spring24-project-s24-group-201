@@ -51,6 +51,7 @@ export default class ViewingArea extends Interactable {
   interact(): void {
     this._labelText?.setVisible(false);
     this._isInteracting = true;
+    this.townController.interactableEmitter.emit('playVideo', this.defaultVideoURL);
   }
 
   getType(): KnownInteractableTypes {
