@@ -1,18 +1,20 @@
 import { Container } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
-import ReactPlayer from 'react-player';
+//import ReactPlayer from 'react-player';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import ViewingAreaController from '../../../classes/interactable/ViewingAreaController';
 import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
+import VideoRenderer from './YouTube/VideoRenderer';
+import YouTubeSearch from './YouTube/YouTubeSearch';
 
-const ALLOWED_DRIFT = 3;
-export class MockReactPlayer extends ReactPlayer {
-  render(): React.ReactNode {
-    return <></>;
-  }
-}
+// const ALLOWED_DRIFT = 3;
+// export class MockReactPlayer extends ReactPlayer {
+//   render(): React.ReactNode {
+//     return <></>;
+//   }
+// }
 
 /**
  * The ViewingAreaVideo component renders a ViewingArea's video, using the ReactPlayer component.
@@ -38,74 +40,37 @@ export function ViewingAreaVideo({
 }: {
   controller: ViewingAreaController;
 }): JSX.Element {
-  const [isPlaying, setPlaying] = useState<boolean>(controller.isPlaying);
-  const townController = useTownController();
-
-  const reactPlayerRef = useRef<ReactPlayer>(null);
+  const [videoUrl, setVideoUrl] = useState<string | undefined>(controller.video);
 
   useEffect(() => {
-    const progressListener = (newTime: number) => {
-      const currentTime = reactPlayerRef.current?.getCurrentTime();
-      if (currentTime !== undefined && Math.abs(currentTime - newTime) > ALLOWED_DRIFT) {
-        reactPlayerRef.current?.seekTo(newTime, 'seconds');
-      }
+    const handleVideoChange = (newVideoUrl: string | undefined) => {
+      setVideoUrl(newVideoUrl);
     };
-    controller.addListener('progressChange', progressListener);
-    controller.addListener('playbackChange', setPlaying);
+    controller.addListener('videoChange', handleVideoChange);
     return () => {
-      controller.removeListener('playbackChange', setPlaying);
-      controller.removeListener('progressChange', progressListener);
+      controller.removeListener('videoChange', handleVideoChange);
     };
   }, [controller]);
 
   return (
     <Container className='participant-wrapper'>
-      Viewing Area: {controller.id}
-      <ReactPlayer
-        url={controller.video}
-        ref={reactPlayerRef}
-        config={{
-          youtube: {
-            playerVars: {
-              // disable skipping time via keyboard to avoid weirdness with chat, etc
-              disablekb: 1,
-              autoplay: 1,
-              // modestbranding: 1,
-            },
-          },
-        }}
-        playing={isPlaying}
-        onProgress={state => {
-          if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-            controller.elapsedTimeSec = state.playedSeconds;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPlay={() => {
-          if (!controller.isPlaying) {
-            controller.isPlaying = true;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPause={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onEnded={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        controls={true}
-        width='100%'
-        height='100%'
-      />
+      Viewing Area: {controller.friendlyName}{' '}
+      {videoUrl && <VideoRenderer videoId={videoUrl.split('v=')[1]} />}
     </Container>
   );
 }
+
+// export function ViewingAreaVideo(): JSX.Element {
+//   // Hardcoded video URL (extract the video ID from the URL)
+//   const videoId = 'dQw4w9WgXcQ';
+
+//   return (
+//     <div className='participant-wrapper'>
+//       Viewing Area Video:
+//       <VideoRenderer videoId={videoId} />
+//     </div>
+//   );
+// }
 
 /**
  * The ViewingArea monitors the player's interaction with a ViewingArea on the map: displaying either
@@ -159,14 +124,54 @@ export function ViewingArea({
   );
 }
 
+// export function ViewingArea({
+//   viewingArea,
+// }: {
+//   viewingArea: ViewingAreaInteractable;
+// }): JSX.Element {
+//   // You can still use the controller if you need to perform actions or checks based on the viewing area state
+//   const townController = useTownController();
+//   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
+//     viewingArea.name,
+//   );
+
+//   // Directly return the ViewingAreaVideo component, assuming that the interaction implies wanting to see the video
+//   return <ViewingAreaVideo />;
+// }
+
 /**
  * The ViewingAreaWrapper is suitable to be *always* rendered inside of a town, and
  * will activate only if the player begins interacting with a viewing area.
  */
 export default function ViewingAreaWrapper(): JSX.Element {
+  const [videoId, setVideoId] = useState<string | undefined>(undefined);
+  const townController = useTownController();
   const viewingArea = useInteractable<ViewingAreaInteractable>('viewingArea');
+
+  useEffect(() => {
+    if (videoId && viewingArea) {
+      // Assuming you have a method to retrieve the controller using the ID
+      const viewingAreaController = townController.getViewingAreaController(viewingArea);
+      viewingAreaController.video = `https://www.youtube.com/watch?v=${videoId}`;
+    }
+  }, [videoId, viewingArea, townController]);
+
   if (viewingArea) {
-    return <ViewingArea viewingArea={viewingArea} />;
+    const viewingAreaController = townController.getViewingAreaController(viewingArea);
+    return (
+      <>
+        <YouTubeSearch
+          onVideoSelect={setVideoId}
+          onFocus={() => townController.pause()}
+          onBlur={() => townController.unPause()}
+        />
+        {videoId && <ViewingAreaVideo controller={viewingAreaController} />}
+      </>
+    );
   }
+
+  // When no viewing area is interacted with, render nothing or some placeholder
   return <></>;
 }
+
+//make whole page a parent, multiple child components
