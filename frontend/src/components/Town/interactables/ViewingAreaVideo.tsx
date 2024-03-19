@@ -1,4 +1,13 @@
-import { Container } from '@chakra-ui/react';
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Container,
+  Heading,
+} from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
@@ -6,6 +15,7 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
+import ChatChannel from './ChatChannel';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -61,6 +71,19 @@ export function ViewingAreaVideo({
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
+      <Accordion allowToggle>
+        <AccordionItem>
+          <Heading as='h3'>
+            <AccordionButton>
+              <Box flex='1' textAlign='left'>
+                Statistics
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>{/* <Leaderboard results={history} /> */}</AccordionPanel>
+          </Heading>
+        </AccordionItem>
+      </Accordion>
       <ReactPlayer
         url={controller.video}
         ref={reactPlayerRef}
@@ -103,6 +126,20 @@ export function ViewingAreaVideo({
         width='100%'
         height='100%'
       />
+      <Box
+        style={{
+          height: '400px',
+          overflowY: 'scroll',
+        }}>
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
+          <ChatChannel interactableID={controller.id} />
+        </div>
+      </Box>
     </Container>
   );
 }
