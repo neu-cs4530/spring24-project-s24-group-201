@@ -69,50 +69,65 @@ export function ViewingAreaVideo({
   }, [controller]);
 
   return (
-    <Container className='participant-wrapper'>
-      Viewing Area: {controller.id}
-      <ReactPlayer
-        url={controller.video}
-        ref={reactPlayerRef}
-        config={{
-          youtube: {
-            playerVars: {
-              // disable skipping time via keyboard to avoid weirdness with chat, etc
-              disablekb: 1,
-              autoplay: 1,
-              // modestbranding: 1,
+    <>
+      <Accordion allowToggle>
+        <AccordionItem>
+          <Heading as='h3'>
+            <AccordionButton>
+              <Box flex='1' textAlign='left'>
+                Leaderboard
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>{/* <Statistics /> */}</AccordionPanel>
+          </Heading>
+        </AccordionItem>
+      </Accordion>
+      <Container className='participant-wrapper'>
+        Viewing Area: {controller.id}
+        <ReactPlayer
+          url={controller.video}
+          ref={reactPlayerRef}
+          config={{
+            youtube: {
+              playerVars: {
+                // disable skipping time via keyboard to avoid weirdness with chat, etc
+                disablekb: 1,
+                autoplay: 1,
+                // modestbranding: 1,
+              },
             },
-          },
-        }}
-        playing={isPlaying}
-        onProgress={state => {
-          if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-            controller.elapsedTimeSec = state.playedSeconds;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPlay={() => {
-          if (!controller.isPlaying) {
-            controller.isPlaying = true;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPause={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onEnded={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        controls={true}
-        width='100%'
-        height='100%'
-      />
+          }}
+          playing={isPlaying}
+          onProgress={state => {
+            if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
+              controller.elapsedTimeSec = state.playedSeconds;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onPlay={() => {
+            if (!controller.isPlaying) {
+              controller.isPlaying = true;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onPause={() => {
+            if (controller.isPlaying) {
+              controller.isPlaying = false;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onEnded={() => {
+            if (controller.isPlaying) {
+              controller.isPlaying = false;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          controls={true}
+          width='100%'
+          height='100%'
+        />
+      </Container>
       <Box
         style={{
           height: '400px',
@@ -127,7 +142,7 @@ export function ViewingAreaVideo({
           <ChatChannel interactableID={controller.id} />
         </div>
       </Box>
-    </Container>
+    </>
   );
 }
 
