@@ -71,19 +71,6 @@ export function ViewingAreaVideo({
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Statistics
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>{/* <Leaderboard results={history} /> */}</AccordionPanel>
-          </Heading>
-        </AccordionItem>
-      </Accordion>
       <ReactPlayer
         url={controller.video}
         ref={reactPlayerRef}
