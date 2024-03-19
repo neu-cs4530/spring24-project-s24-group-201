@@ -70,19 +70,6 @@ export function ViewingAreaVideo({
 
   return (
     <>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Leaderboard
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>{/* <Statistics /> */}</AccordionPanel>
-          </Heading>
-        </AccordionItem>
-      </Accordion>
       <Container className='participant-wrapper'>
         Viewing Area: {controller.id}
         <ReactPlayer
@@ -128,20 +115,6 @@ export function ViewingAreaVideo({
           height='100%'
         />
       </Container>
-      <Box
-        style={{
-          height: '400px',
-          overflowY: 'scroll',
-        }}>
-        <div
-          style={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-          }}>
-          <ChatChannel interactableID={controller.id} />
-        </div>
-      </Box>
     </>
   );
 }
