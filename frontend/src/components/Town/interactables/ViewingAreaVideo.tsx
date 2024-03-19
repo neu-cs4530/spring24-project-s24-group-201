@@ -114,6 +114,20 @@ export function ViewingAreaVideo({
           width='100%'
           height='100%'
         />
+        <Box
+          style={{
+            height: '400px',
+            overflowY: 'scroll',
+          }}>
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+            <ChatChannel interactableID={controller.id} />
+          </div>
+        </Box>
       </Container>
     </>
   );
