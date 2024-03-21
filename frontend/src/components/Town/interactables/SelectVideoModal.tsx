@@ -54,7 +54,7 @@ export default function SelectVideoModal({
     if (video && viewingAreaController) {
       const request = {
         id: viewingAreaController.id,
-        video: queue[0],
+        video: queue.shift(),
         isPlaying: true,
         elapsedTimeSec: 0,
         occupants: [],
