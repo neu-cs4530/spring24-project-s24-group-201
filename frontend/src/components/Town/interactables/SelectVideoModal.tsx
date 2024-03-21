@@ -54,11 +54,11 @@ export default function SelectVideoModal({
     if (video && viewingAreaController) {
       const request = {
         id: viewingAreaController.id,
-        video,
+        video: queue[0],
         isPlaying: true,
         elapsedTimeSec: 0,
         occupants: [],
-        queue: [],
+        queue: queue,
       };
       try {
         await coveyTownController.createViewingArea(request);
@@ -83,7 +83,7 @@ export default function SelectVideoModal({
         }
       }
     }
-  }, [video, coveyTownController, viewingAreaController, toast]);
+  }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
     <Modal
