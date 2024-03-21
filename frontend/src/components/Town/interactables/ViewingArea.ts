@@ -5,6 +5,8 @@ export default class ViewingArea extends Interactable {
 
   private _defaultVideoURL?: string;
 
+  private _defaultQueue?: string[];
+
   private _isInteracting = false;
 
   public get defaultVideoURL() {
@@ -14,12 +16,20 @@ export default class ViewingArea extends Interactable {
     return this._defaultVideoURL;
   }
 
+  public get defaultQueue() {
+    if (!this._defaultQueue) {
+      return [];
+    }
+    return this._defaultQueue;
+  }
+
   addedToScene() {
     super.addedToScene();
     this.setTintFill();
     this.setAlpha(0.3);
 
     this._defaultVideoURL = this.getData('video');
+    this._defaultQueue = this.getData('queue');
     this._labelText = this.scene.add.text(
       this.x - this.displayWidth / 2,
       this.y - this.displayHeight / 2,

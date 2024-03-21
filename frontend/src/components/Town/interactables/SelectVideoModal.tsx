@@ -33,6 +33,7 @@ export default function SelectVideoModal({
   );
 
   const [video, setVideo] = useState<string>(viewingArea?.defaultVideoURL || '');
+  const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
 
   useEffect(() => {
     if (isOpen) {
@@ -57,6 +58,7 @@ export default function SelectVideoModal({
         isPlaying: true,
         elapsedTimeSec: 0,
         occupants: [],
+        queue: [],
       };
       try {
         await coveyTownController.createViewingArea(request);
@@ -113,6 +115,12 @@ export default function SelectVideoModal({
           <ModalFooter>
             <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
               Set video
+            </Button>
+            <Button
+              colorScheme='green'
+              mr={3}
+              onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+              Add to queue
             </Button>
             <Button onClick={closeModal}>Cancel</Button>
           </ModalFooter>

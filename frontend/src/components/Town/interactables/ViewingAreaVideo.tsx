@@ -191,6 +191,16 @@ export function ViewingArea({
   }
   return (
     <>
+      <SelectVideoModal
+        isOpen={selectIsOpen}
+        close={() => {
+          setSelectIsOpen(false);
+          // forces game to emit "viewingArea" event again so that
+          // repoening the modal works as expected
+          townController.interactEnd(viewingArea);
+        }}
+        viewingArea={viewingArea}
+      />
       <ViewingAreaVideo controller={viewingAreaController} />
     </>
   );

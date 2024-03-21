@@ -115,6 +115,25 @@ export default class ViewingAreaController extends InteractableAreaController<
     }
   }
 
+  /**
+   * The queue of the video assigned to this viewing area, or undefined if there is not one.
+   */
+  public get queue() {
+    return this._model.queue;
+  }
+
+  /**
+   * The queue of the video assigned to this viewing area, or undefined if there is not one.
+   *
+   * Changing this value will emit a 'queueChange' event to listeners
+   */
+  public set queue(queue: string[]) {
+    if (this._model.queue !== queue) {
+      this._model.queue = queue;
+      this.emit('queueChange', queue);
+    }
+  }
+
   public get friendlyName(): string {
     return this.id;
   }
