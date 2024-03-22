@@ -115,6 +115,7 @@ export default function SelectVideoModal({
             </FormControl>
           </ModalBody>
           <ModalFooter>
+            {queue.length}
             <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
               Set video
             </Button>

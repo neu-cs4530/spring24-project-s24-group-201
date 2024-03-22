@@ -84,6 +84,7 @@ export function ViewingAreaVideo({
           </Heading>
         </AccordionItem>
       </Accordion>
+      {controller.queue} {controller.queue.length} hello
       <ReactPlayer
         url={controller.video}
         ref={reactPlayerRef}
