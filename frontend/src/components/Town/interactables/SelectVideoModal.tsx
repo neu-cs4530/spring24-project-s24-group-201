@@ -51,14 +51,16 @@ export default function SelectVideoModal({
   const toast = useToast();
 
   const createViewingArea = useCallback(async () => {
+    const videoToPlay = queue.shift();
+    const updatedQueue = [...queue];
     if (video && viewingAreaController) {
       const request = {
         id: viewingAreaController.id,
-        video: queue.shift(),
+        video: videoToPlay,
         isPlaying: true,
         elapsedTimeSec: 0,
         occupants: [],
-        queue: queue,
+        queue: updatedQueue,
       };
       try {
         await coveyTownController.createViewingArea(request);

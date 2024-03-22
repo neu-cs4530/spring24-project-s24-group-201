@@ -194,6 +194,7 @@ export async function mockTownControllerConnection(
         elapsedTimeSec: 0,
         isPlaying: false,
         occupants: [],
+        queue: [],
         type: 'ViewingArea',
       } as ViewingArea);
     }

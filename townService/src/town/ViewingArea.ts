@@ -77,10 +77,11 @@ export default class ViewingArea extends InteractableArea {
    *
    * @param viewingArea updated model
    */
-  public updateModel({ isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel) {
+  public updateModel({ isPlaying, elapsedTimeSec: progress, video, queue }: ViewingAreaModel) {
     this._video = video;
     this._isPlaying = isPlaying;
     this._elapsedTimeSec = progress;
+    this._queue = queue;
   }
 
   /**
