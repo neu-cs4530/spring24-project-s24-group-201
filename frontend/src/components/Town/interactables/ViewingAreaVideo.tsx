@@ -124,6 +124,9 @@ export function ViewingAreaVideo({
             onEnded={() => {
               if (controller.isPlaying) {
                 controller.isPlaying = false;
+                if (controller.queue.length > 0) {
+                  controller.video = controller.queue.shift();
+                }
                 townController.emitViewingAreaUpdate(controller);
               }
             }}
