@@ -125,7 +125,6 @@ export default function ParticipantList() {
         // highlight={highlightedProfiles?.includes(localUserProfile.id) ?? false}
         slot={0}
       />
-      <ViewingAreaVideo />
 
       {participants
         .filter(p => nearbyPlayers.find(player => player.id == p.participant.identity))

@@ -6,6 +6,7 @@ import {
   AccordionPanel,
   Box,
   Container,
+  Flex,
   Heading,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -54,6 +55,7 @@ export function ViewingAreaVideo({
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
   useEffect(() => {
+    console.log(controller.queue);
     const progressListener = (newTime: number) => {
       const currentTime = reactPlayerRef.current?.getCurrentTime();
       if (currentTime !== undefined && Math.abs(currentTime - newTime) > ALLOWED_DRIFT) {
@@ -84,63 +86,67 @@ export function ViewingAreaVideo({
           </Heading>
         </AccordionItem>
       </Accordion>
-      {controller.queue} {controller.queue.length} hello
-      <ReactPlayer
-        url={controller.video}
-        ref={reactPlayerRef}
-        config={{
-          youtube: {
-            playerVars: {
-              // disable skipping time via keyboard to avoid weirdness with chat, etc
-              disablekb: 1,
-              autoplay: 1,
-              // modestbranding: 1,
-            },
-          },
-        }}
-        playing={isPlaying}
-        onProgress={state => {
-          if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-            controller.elapsedTimeSec = state.playedSeconds;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPlay={() => {
-          if (!controller.isPlaying) {
-            controller.isPlaying = true;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPause={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onEnded={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        controls={true}
-        width='100%'
-        height='100%'
-      />
-      <Box
-        style={{
-          height: '400px',
-          overflowY: 'scroll',
-        }}>
-        <div
+      {controller.video} {controller.queue} {controller.queue.length} hello
+      <Flex direction='column'>
+        <Box>
+          <ReactPlayer
+            url={controller.video}
+            ref={reactPlayerRef}
+            config={{
+              youtube: {
+                playerVars: {
+                  // disable skipping time via keyboard to avoid weirdness with chat, etc
+                  disablekb: 1,
+                  autoplay: 1,
+                  // modestbranding: 1,
+                },
+              },
+            }}
+            playing={isPlaying}
+            onProgress={state => {
+              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
+                controller.elapsedTimeSec = state.playedSeconds;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPlay={() => {
+              if (!controller.isPlaying) {
+                controller.isPlaying = true;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPause={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onEnded={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            controls={true}
+            width='100%'
+            height='100%'
+          />
+        </Box>
+        <Box
           style={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
+            height: '400px',
+            overflowY: 'scroll',
           }}>
-          <ChatChannel interactableID={controller.id} />
-        </div>
-      </Box>
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+            <ChatChannel interactableID={controller.id} />
+          </div>
+        </Box>
+      </Flex>
     </Container>
   );
 }
