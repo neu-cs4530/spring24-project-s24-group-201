@@ -427,6 +427,7 @@ describe('Town', () => {
             video: nanoid(),
             occupants: [],
             type: 'ViewingArea',
+            queue: [],
           };
           expect(town.addViewingArea(newArea)).toBe(true);
           secondPlayer = mockPlayer(town.townID);
@@ -520,6 +521,7 @@ describe('Town', () => {
             video: nanoid(),
             occupants: [],
             type: 'ViewingArea',
+            queue: [],
           }),
         ).toBeTruthy();
         const viewingArea = town.getInteractable('Name3');
@@ -568,6 +570,7 @@ describe('Town', () => {
           video: nanoid(),
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         };
         interactableUpdateCallback(update);
       });
@@ -699,6 +702,7 @@ describe('Town', () => {
           video: nanoid(),
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         }),
       ).toBe(false);
     });
@@ -711,6 +715,7 @@ describe('Town', () => {
           video: '',
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         }),
       ).toBe(false);
       expect(
@@ -721,6 +726,7 @@ describe('Town', () => {
           video: undefined,
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         }),
       ).toBe(false);
     });
@@ -733,6 +739,7 @@ describe('Town', () => {
           video: 'test',
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         }),
       ).toBe(true);
       expect(
@@ -743,6 +750,7 @@ describe('Town', () => {
           video: 'test2',
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         }),
       ).toBe(false);
     });
@@ -754,6 +762,7 @@ describe('Town', () => {
         video: nanoid(),
         occupants: [playerID],
         type: 'ViewingArea',
+        queue: [],
       };
       beforeEach(() => {
         playerTestData.moveTo(160, 570); // Inside of "Name3" area
