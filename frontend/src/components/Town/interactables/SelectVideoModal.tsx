@@ -22,10 +22,12 @@ export default function SelectVideoModal({
   isOpen,
   close,
   viewingArea,
+  viewingVideo,
 }: {
   isOpen: boolean;
   close: () => void;
   viewingArea: ViewingArea;
+  viewingVideo: JSX.Element;
 }): JSX.Element {
   const coveyTownController = useTownController();
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
@@ -34,14 +36,16 @@ export default function SelectVideoModal({
 
   const [video, setVideo] = useState<string>(viewingArea?.defaultVideoURL || '');
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
+  const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       coveyTownController.pause();
+      viewingAreaController.queue = queue;
     } else {
       coveyTownController.unPause();
     }
-  }, [coveyTownController, isOpen]);
+  }, [coveyTownController, isOpen, viewingAreaController, queue]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
@@ -51,6 +55,7 @@ export default function SelectVideoModal({
   const toast = useToast();
 
   const createViewingArea = useCallback(async () => {
+    setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
@@ -115,10 +120,12 @@ export default function SelectVideoModal({
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            {queue.length}
-            <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-              Set video
-            </Button>
+            {queue}
+            {isBeginButtonVisible && (
+              <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
+                Begin
+              </Button>
+            )}
             <Button
               colorScheme='green'
               mr={3}
@@ -128,6 +135,7 @@ export default function SelectVideoModal({
             <Button onClick={closeModal}>Cancel</Button>
           </ModalFooter>
         </form>
+        {viewingVideo}
       </ModalContent>
     </Modal>
   );

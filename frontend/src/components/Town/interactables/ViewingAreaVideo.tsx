@@ -86,7 +86,7 @@ export function ViewingAreaVideo({
           </Heading>
         </AccordionItem>
       </Accordion>
-      {controller.video} {controller.queue} {controller.queue.length} hello
+      {controller.queue}
       <Flex direction='column'>
         <Box>
           <ReactPlayer
@@ -196,13 +196,22 @@ export function ViewingArea({
           townController.interactEnd(viewingArea);
         }}
         viewingArea={viewingArea}
+        viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
       />
     );
   }
   return (
-    <>
-      <ViewingAreaVideo controller={viewingAreaController} />
-    </>
+    <SelectVideoModal
+      isOpen={selectIsOpen}
+      close={() => {
+        setSelectIsOpen(false);
+        // forces game to emit "viewingArea" event again so that
+        // repoening the modal works as expected
+        townController.interactEnd(viewingArea);
+      }}
+      viewingArea={viewingArea}
+      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
+    />
   );
 }
 
