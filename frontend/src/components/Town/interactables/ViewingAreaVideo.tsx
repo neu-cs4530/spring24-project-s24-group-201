@@ -43,6 +43,9 @@ export function ViewingAreaVideo({
 
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
+  const youtubeBaseURL = 'https://www.youtube.com/watch?v=';
+  const videoURL = `${youtubeBaseURL}${controller.video}`;
+
   useEffect(() => {
     const progressListener = (newTime: number) => {
       const currentTime = reactPlayerRef.current?.getCurrentTime();
@@ -62,7 +65,7 @@ export function ViewingAreaVideo({
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
       <ReactPlayer
-        url={controller.video}
+        url={videoURL}
         ref={reactPlayerRef}
         config={{
           youtube: {
@@ -99,6 +102,7 @@ export function ViewingAreaVideo({
             townController.emitViewingAreaUpdate(controller);
           }
         }}
+        onError={e => console.error('ReactPlayer error:', e)}
         controls={true}
         width='100%'
         height='100%'

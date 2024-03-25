@@ -11,10 +11,12 @@ import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
 import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
+import youtubeSearchRouter from './api/youtubeSearch';
 
 // Create the server instances
 const app = Express();
 app.use(CORS());
+app.use('/api', youtubeSearchRouter);
 const server = http.createServer(app);
 const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: { origin: '*' },
