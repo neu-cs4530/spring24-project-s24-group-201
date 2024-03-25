@@ -106,6 +106,7 @@ describe('[T4] Viewing Area Video', () => {
       isPlaying: true,
       video: 'test',
       occupants: [],
+      queue: [],
       type: 'ViewingArea',
     });
 
@@ -233,6 +234,7 @@ describe('[T4] Viewing Area Video', () => {
             isPlaying: true,
             video: 'test',
             occupants: [],
+            queue: [],
             type: 'ViewingArea',
           });
           const newAddListenerSpy = jest.spyOn(newViewingArea, 'addListener');

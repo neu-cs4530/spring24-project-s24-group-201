@@ -1,4 +1,14 @@
-import { Container } from '@chakra-ui/react';
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Container,
+  Flex,
+  Heading,
+} from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
@@ -6,6 +16,7 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
+import ChatChannel from './ChatChannel';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -65,49 +76,83 @@ export function ViewingAreaVideo({
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
-      <ReactPlayer
-        url={videoURL}
-        ref={reactPlayerRef}
-        config={{
-          youtube: {
-            playerVars: {
-              // disable skipping time via keyboard to avoid weirdness with chat, etc
-              disablekb: 1,
-              autoplay: 1,
-              // modestbranding: 1,
-            },
-          },
-        }}
-        playing={isPlaying}
-        onProgress={state => {
-          if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-            controller.elapsedTimeSec = state.playedSeconds;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPlay={() => {
-          if (!controller.isPlaying) {
-            controller.isPlaying = true;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onPause={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onEnded={() => {
-          if (controller.isPlaying) {
-            controller.isPlaying = false;
-            townController.emitViewingAreaUpdate(controller);
-          }
-        }}
-        onError={e => console.error('ReactPlayer error:', e)}
-        controls={true}
-        width='100%'
-        height='100%'
-      />
+      <Accordion allowToggle>
+        <AccordionItem>
+          <Heading as='h3'>
+            <AccordionButton>
+              <Box flex='1' textAlign='left'>
+                Leaderboard
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>{/* <Statistics /> */}</AccordionPanel>
+          </Heading>
+        </AccordionItem>
+      </Accordion>
+      {controller.queue}
+      <Flex direction='column'>
+        <Box>
+          <ReactPlayer
+            url={controller.video}
+            ref={reactPlayerRef}
+            config={{
+              youtube: {
+                playerVars: {
+                  // disable skipping time via keyboard to avoid weirdness with chat, etc
+                  disablekb: 1,
+                  autoplay: 1,
+                  // modestbranding: 1,
+                },
+              },
+            }}
+            playing={isPlaying}
+            onProgress={state => {
+              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
+                controller.elapsedTimeSec = state.playedSeconds;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPlay={() => {
+              if (!controller.isPlaying) {
+                controller.isPlaying = true;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPause={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onEnded={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                if (controller.queue.length > 0) {
+                  controller.video = controller.queue.shift();
+                }
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            controls={true}
+            width='100%'
+            height='100%'
+          />
+        </Box>
+        <Box
+          style={{
+            height: '400px',
+            overflowY: 'scroll',
+          }}>
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+            <ChatChannel interactableID={controller.id} />
+          </div>
+        </Box>
+      </Flex>
     </Container>
   );
 }
@@ -154,13 +199,22 @@ export function ViewingArea({
           townController.interactEnd(viewingArea);
         }}
         viewingArea={viewingArea}
+        viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
       />
     );
   }
   return (
-    <>
-      <ViewingAreaVideo controller={viewingAreaController} />
-    </>
+    <SelectVideoModal
+      isOpen={selectIsOpen}
+      close={() => {
+        setSelectIsOpen(false);
+        // forces game to emit "viewingArea" event again so that
+        // repoening the modal works as expected
+        townController.interactEnd(viewingArea);
+      }}
+      viewingArea={viewingArea}
+      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
+    />
   );
 }
 

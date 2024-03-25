@@ -15,11 +15,12 @@ describe('ViewingArea', () => {
   const elapsedTimeSec = 10;
   const video = nanoid();
   const occupants: PlayerID[] = [];
+  const queue: string[] = [];
 
   beforeEach(() => {
     mockClear(townEmitter);
     testArea = new ViewingArea(
-      { id, isPlaying, elapsedTimeSec, video, occupants },
+      { id, isPlaying, elapsedTimeSec, video, occupants, queue },
       testAreaBox,
       townEmitter,
     );
@@ -43,6 +44,7 @@ describe('ViewingArea', () => {
         video,
         occupants: [extraPlayer.id],
         type: 'ViewingArea',
+        queue: [],
       });
     });
     it("Clears the player's conversationLabel and emits an update for their location", () => {
@@ -61,6 +63,7 @@ describe('ViewingArea', () => {
         video: undefined,
         occupants: [],
         type: 'ViewingArea',
+        queue: [],
       });
       expect(testArea.video).toBeUndefined();
     });
@@ -85,6 +88,7 @@ describe('ViewingArea', () => {
       isPlaying,
       occupants: [newPlayer.id],
       type: 'ViewingArea',
+      queue: [],
     });
   });
   test('updateModel sets video, isPlaying and elapsedTimeSec', () => {
@@ -95,6 +99,7 @@ describe('ViewingArea', () => {
       video: 'test2',
       occupants: [],
       type: 'ViewingArea',
+      queue: [],
     });
     expect(testArea.isPlaying).toBe(false);
     expect(testArea.id).toBe(id);

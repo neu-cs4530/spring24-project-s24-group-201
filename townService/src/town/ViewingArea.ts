@@ -19,6 +19,8 @@ export default class ViewingArea extends InteractableArea {
 
   private _elapsedTimeSec: number;
 
+  private _queue: string[];
+
   public get video() {
     return this._video;
   }
@@ -31,6 +33,10 @@ export default class ViewingArea extends InteractableArea {
     return this._isPlaying;
   }
 
+  public get queue() {
+    return this._queue;
+  }
+
   /**
    * Creates a new ViewingArea
    *
@@ -39,7 +45,7 @@ export default class ViewingArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, isPlaying, elapsedTimeSec: progress, video }: Omit<ViewingAreaModel, 'type'>,
+    { id, isPlaying, elapsedTimeSec: progress, video, queue }: Omit<ViewingAreaModel, 'type'>,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -47,6 +53,7 @@ export default class ViewingArea extends InteractableArea {
     this._video = video;
     this._elapsedTimeSec = progress;
     this._isPlaying = isPlaying;
+    this._queue = queue;
   }
 
   /**
@@ -70,10 +77,11 @@ export default class ViewingArea extends InteractableArea {
    *
    * @param viewingArea updated model
    */
-  public updateModel({ isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel) {
+  public updateModel({ isPlaying, elapsedTimeSec: progress, video, queue }: ViewingAreaModel) {
     this._video = video;
     this._isPlaying = isPlaying;
     this._elapsedTimeSec = progress;
+    this._queue = queue;
   }
 
   /**
@@ -88,6 +96,7 @@ export default class ViewingArea extends InteractableArea {
       elapsedTimeSec: this._elapsedTimeSec,
       occupants: this.occupantsByID,
       type: 'ViewingArea',
+      queue: this.queue,
     };
   }
 
@@ -104,7 +113,7 @@ export default class ViewingArea extends InteractableArea {
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new ViewingArea(
-      { isPlaying: false, id: name as InteractableID, elapsedTimeSec: 0, occupants: [] },
+      { isPlaying: false, id: name as InteractableID, elapsedTimeSec: 0, occupants: [], queue: [] },
       rect,
       townEmitter,
     );

@@ -17,6 +17,7 @@ describe('[T2] ViewingAreaController', () => {
       elapsedTimeSec: 12,
       video: nanoid(),
       occupants: [],
+      queue: [],
       type: 'ViewingArea',
     };
     testArea = new ViewingAreaController(testAreaModel);
@@ -79,6 +80,7 @@ describe('[T2] ViewingAreaController', () => {
         elapsedTimeSec: testArea.elapsedTimeSec + 1,
         isPlaying: !testArea.isPlaying,
         occupants: [],
+        queue: [],
         type: 'ViewingArea',
       };
       testArea.updateFrom(newModel, []);
@@ -97,6 +99,7 @@ describe('[T2] ViewingAreaController', () => {
         elapsedTimeSec: testArea.elapsedTimeSec + 1,
         isPlaying: !testArea.isPlaying,
         occupants: [],
+        queue: [],
         type: 'ViewingArea',
       };
       testArea.updateFrom(newModel, []);
