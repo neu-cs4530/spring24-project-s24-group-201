@@ -83,23 +83,23 @@ export function ViewingAreaVideo({
   // Handler functions
   const handlePlay = () => {
     setPlaying(true);
-    controller.isPlaying = true; 
+    controller.isPlaying = true;
     townController.emitViewingAreaUpdate(controller);
   };
 
   const handlePause = () => {
     setPlaying(false);
-    controller.isPlaying = false; 
+    controller.isPlaying = false;
     townController.emitViewingAreaUpdate(controller);
   };
 
   const handleEnded = () => {
     setPlaying(false);
-    controller.isPlaying = false; 
+    controller.isPlaying = false;
 
     if (controller.queue.length > 0) {
       const nextVideo = controller.queue.shift();
-      setVideoURL(nextVideo || ''); 
+      setVideoURL(nextVideo || '');
     }
 
     townController.emitViewingAreaUpdate(controller);
