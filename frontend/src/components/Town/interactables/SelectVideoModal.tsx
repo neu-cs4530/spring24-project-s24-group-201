@@ -180,6 +180,14 @@ export default function SelectVideoModal({
               onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
               Add to queue
             </Button>
+            {queue.length !== 0 && (
+              <Button
+                colorScheme='yellow'
+                mr={3}
+                onClick={() => (viewingAreaController.video = queue.shift())}>
+                Skip Video
+              </Button>
+            )}
             <Button onClick={closeModal}>Cancel</Button>
           </ModalFooter>
         </form>
