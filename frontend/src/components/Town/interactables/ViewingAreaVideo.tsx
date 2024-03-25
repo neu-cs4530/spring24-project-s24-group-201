@@ -25,6 +25,10 @@ export class MockReactPlayer extends ReactPlayer {
   }
 }
 
+interface ProgressState {
+  playedSeconds: number;
+}
+
 /**
  * The ViewingAreaVideo component renders a ViewingArea's video, using the ReactPlayer component.
  * The URL property of the ReactPlayer is set to the ViewingAreaController's video property, and the isPlaying
@@ -50,13 +54,14 @@ export function ViewingAreaVideo({
   controller: ViewingAreaController;
 }): JSX.Element {
   const [isPlaying, setPlaying] = useState<boolean>(controller.isPlaying);
+  const [videoURL, setVideoURL] = useState<string>(controller.video || '');
   const townController = useTownController();
-
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
-  const youtubeBaseURL = 'https://www.youtube.com/watch?v=';
-  const videoURL = `${youtubeBaseURL}${controller.video}`;
-  controller.video = videoURL;
+  // Sync state with the controller video property
+  useEffect(() => {
+    return setVideoURL(controller.video || '');
+  }, [controller.video]);
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
@@ -67,6 +72,8 @@ export function ViewingAreaVideo({
     };
     controller.addListener('progressChange', progressListener);
     controller.addListener('playbackChange', setPlaying);
+
+    // The clean-up function
     return () => {
       controller.removeListener('playbackChange', setPlaying);
       controller.removeListener('progressChange', progressListener);
@@ -93,15 +100,13 @@ export function ViewingAreaVideo({
       <Flex direction='column'>
         <Box>
           <ReactPlayer
-            url={controller.video}
+            url={videoURL}
             ref={reactPlayerRef}
             config={{
               youtube: {
                 playerVars: {
-                  // disable skipping time via keyboard to avoid weirdness with chat, etc
                   disablekb: 1,
                   autoplay: 1,
-                  // modestbranding: 1,
                 },
               },
             }}
