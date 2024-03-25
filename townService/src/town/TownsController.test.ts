@@ -313,6 +313,7 @@ describe('TownsController integration tests', () => {
             isPlaying: true,
             occupants: [],
             type: 'ViewingArea',
+            queue: [],
           };
           await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
           // Check to see that the viewing area was successfully updated
@@ -334,6 +335,7 @@ describe('TownsController integration tests', () => {
           isPlaying: true,
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         };
         await expect(
           controller.createViewingArea(nanoid(), sessionToken, newViewingArea),
@@ -349,6 +351,7 @@ describe('TownsController integration tests', () => {
           isPlaying: true,
           occupants: [],
           type: 'ViewingArea',
+          queue: [],
         };
         await expect(
           controller.createViewingArea(testingTown.townID, invalidSessionToken, newViewingArea),

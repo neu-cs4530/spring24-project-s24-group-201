@@ -48,6 +48,7 @@
         "frontend/src/components/Town/interactables/ConnectFour/ConnectFourArea.tsx",
         "frontend/src/components/Town/interactables/ConnectFour/ConnectFourBoard.tsx",
         "frontend/src/components/Town/interactables/GamesArea.tsx",
+        "frontend/src/components/Town/interactables/ViewingAreaVideo.tsx",
         "frontend/src/components/SocialSidebar/InteractableAreasList.tsx"
     ]
 }

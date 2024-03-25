@@ -22,10 +22,12 @@ export default function SelectVideoModal({
   isOpen,
   close,
   viewingArea,
+  viewingVideo,
 }: {
   isOpen: boolean;
   close: () => void;
   viewingArea: ViewingArea;
+  viewingVideo: JSX.Element;
 }): JSX.Element {
   const coveyTownController = useTownController();
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
@@ -33,14 +35,17 @@ export default function SelectVideoModal({
   );
 
   const [video, setVideo] = useState<string>(viewingArea?.defaultVideoURL || '');
+  const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
+  const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       coveyTownController.pause();
+      viewingAreaController.queue = queue;
     } else {
       coveyTownController.unPause();
     }
-  }, [coveyTownController, isOpen]);
+  }, [coveyTownController, isOpen, viewingAreaController, queue]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
@@ -50,13 +55,17 @@ export default function SelectVideoModal({
   const toast = useToast();
 
   const createViewingArea = useCallback(async () => {
+    setIsBeginButtonVisible(false); // Hide the button when clicked
+    const videoToPlay = queue.shift();
+    const updatedQueue = [...queue];
     if (video && viewingAreaController) {
       const request = {
         id: viewingAreaController.id,
-        video,
+        video: videoToPlay,
         isPlaying: true,
         elapsedTimeSec: 0,
         occupants: [],
+        queue: updatedQueue,
       };
       try {
         await coveyTownController.createViewingArea(request);
@@ -81,7 +90,7 @@ export default function SelectVideoModal({
         }
       }
     }
-  }, [video, coveyTownController, viewingAreaController, toast]);
+  }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
     <Modal
@@ -111,12 +120,22 @@ export default function SelectVideoModal({
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-              Set video
+            {queue}
+            {isBeginButtonVisible && (
+              <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
+                Begin
+              </Button>
+            )}
+            <Button
+              colorScheme='green'
+              mr={3}
+              onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+              Add to queue
             </Button>
             <Button onClick={closeModal}>Cancel</Button>
           </ModalFooter>
         </form>
+        {viewingVideo}
       </ModalContent>
     </Modal>
   );

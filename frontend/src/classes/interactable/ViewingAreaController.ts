@@ -25,6 +25,11 @@ export type ViewingAreaEvents = BaseInteractableEventMap & {
    * the value `undefined` to indicate that there is no video set.
    */
   videoChange: (video: string | undefined) => void;
+  /**
+   * A playbackChange event indicates that the playing/paused state has changed.
+   * Listeners are passed the new state in the parameter `isPlaying`
+   */
+  queueChange: (queue: string[]) => void;
 };
 
 /**
@@ -115,6 +120,25 @@ export default class ViewingAreaController extends InteractableAreaController<
     }
   }
 
+  /**
+   * The queue of the video assigned to this viewing area, or undefined if there is not one.
+   */
+  public get queue() {
+    return this._model.queue;
+  }
+
+  /**
+   * The queue of the video assigned to this viewing area, or undefined if there is not one.
+   *
+   * Changing this value will emit a 'queueChange' event to listeners
+   */
+  public set queue(queue: string[]) {
+    if (this._model.queue !== queue) {
+      this._model.queue = queue;
+      this.emit('queueChange', queue);
+    }
+  }
+
   public get friendlyName(): string {
     return this.id;
   }
@@ -140,5 +164,6 @@ export default class ViewingAreaController extends InteractableAreaController<
     this.isPlaying = updatedModel.isPlaying;
     this.elapsedTimeSec = updatedModel.elapsedTimeSec;
     this.video = updatedModel.video;
+    this.queue = updatedModel.queue;
   }
 }

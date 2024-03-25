@@ -6,10 +6,15 @@ import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
 import GameAreaWrapper from './interactables/GamesArea';
+import ViewingAreaWrapper from './interactables/ViewingAreaVideo';
 import useChatContext from '../VideoCall/VideoFrontend/hooks/useChatContext/useChatContext';
 import ChatWindow from '../VideoCall/VideoFrontend/components/ChatWindow/ChatWindow';
 import clsx from 'clsx';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
+
+interface TownMapProps {
+  wrapper: number;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function TownMap(): JSX.Element {
+export default function TownMap({ wrapper }: TownMapProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isChatWindowOpen } = useChatContext();
   const classes = useStyles();
@@ -81,18 +86,37 @@ export default function TownMap(): JSX.Element {
     };
   }, [coveyTownController]);
 
-  return (
-    <div id='app-container'>
-      <NewConversationModal />
-      <GameAreaWrapper />
-      <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
-        <ChatWindow />
-      </aside>
+  // 0 represents ViewingAreaWrapper value for wrapper
+  if (wrapper === 0) {
+    return (
+      <div id='app-container'>
+        <NewConversationModal />
+        <ViewingAreaWrapper />
+        <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
+          <ChatWindow />
+        </aside>
 
-      <div id='map-container' />
-      <div id='social-container'>
-        <SocialSidebar />
+        <div id='map-container' />
+        <div id='social-container'>
+          <SocialSidebar />
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    // anything else represents GameAreaWrapper value for wrapper
+    return (
+      <div id='app-container'>
+        <NewConversationModal />
+        <GameAreaWrapper />
+        <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
+          <ChatWindow />
+        </aside>
+
+        <div id='map-container' />
+        <div id='social-container'>
+          <SocialSidebar />
+        </div>
+      </div>
+    );
+  }
 }

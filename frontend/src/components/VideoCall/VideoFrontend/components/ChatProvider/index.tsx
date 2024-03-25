@@ -27,7 +27,6 @@ export const ChatProvider = ({ children, interactableID} : {children?: ReactNode
     if (conversation) {
       const handleMessageAdded = (message: ChatMessage) =>
         setMessages(oldMessages => [...oldMessages, message]);
-      conversation.getMessages().then(newMessages => setMessages(newMessages));
       conversation.onMessageAdded(handleMessageAdded);
       return () => {
         conversation.offMessageAdded(handleMessageAdded);
