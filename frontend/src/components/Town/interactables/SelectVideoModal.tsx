@@ -3,6 +3,8 @@ import {
   FormControl,
   FormLabel,
   Input,
+  List,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,6 +19,12 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ViewingArea from './ViewingArea';
+
+type SearchResultItem = {
+  id: { videoId: string };
+  snippet: { title: string };
+  [key: string]: unknown; // This allows for other unknown properties
+};
 
 export default function SelectVideoModal({
   isOpen,
@@ -35,6 +43,8 @@ export default function SelectVideoModal({
   );
 
   const [video, setVideo] = useState<string>(viewingArea?.defaultVideoURL || '');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
   const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
 
@@ -53,6 +63,32 @@ export default function SelectVideoModal({
   }, [coveyTownController, close]);
 
   const toast = useToast();
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/youtube-search?query=${encodeURIComponent(searchQuery)}`,
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setSearchResults(data.items || []);
+    } catch (error) {
+      const e = error as Error;
+      toast({
+        title: 'Error searching for videos',
+        description: e.message,
+        status: 'error',
+      });
+    }
+  };
+
+  const handleSelectVideo = (videoId: string) => {
+    const fullVideoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    setVideo(fullVideoUrl);
+    setSearchResults([]); // Clear search results after selection
+  };
 
   const createViewingArea = useCallback(async () => {
     setIsBeginButtonVisible(false); // Hide the button when clicked
@@ -93,32 +129,44 @@ export default function SelectVideoModal({
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={() => {
-        closeModal();
-        coveyTownController.unPause();
-      }}>
+    <Modal isOpen={isOpen} onClose={closeModal}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Pick a video to watch in {viewingAreaController?.id} </ModalHeader>
+        <ModalHeader>Pick a video to watch in {viewingAreaController?.id}</ModalHeader>
         <ModalCloseButton />
+        <ModalBody pb={6}>
+          <FormControl mt={4}>
+            <FormLabel htmlFor='search'>Search for Videos</FormLabel>
+            <Input
+              id='search'
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder='Type to search YouTube videos'
+            />
+            <Button mt={2} colorScheme='blue' onClick={handleSearch}>
+              Search
+            </Button>
+            <List spacing={3}>
+              {searchResults.map(item => (
+                <ListItem
+                  key={item.id.videoId}
+                  cursor='pointer'
+                  onClick={() => handleSelectVideo(item.id.videoId)}>
+                  {item.snippet.title}
+                </ListItem>
+              ))}
+            </List>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
+            <Input id='video' name='video' value={video} onChange={e => setVideo(e.target.value)} />
+          </FormControl>
+        </ModalBody>
         <form
           onSubmit={ev => {
             ev.preventDefault();
             createViewingArea();
           }}>
-          <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel htmlFor='video'>Video URL</FormLabel>
-              <Input
-                id='video'
-                name='video'
-                value={video}
-                onChange={e => setVideo(e.target.value)}
-              />
-            </FormControl>
-          </ModalBody>
           <ModalFooter>
             {queue}
             {isBeginButtonVisible && (

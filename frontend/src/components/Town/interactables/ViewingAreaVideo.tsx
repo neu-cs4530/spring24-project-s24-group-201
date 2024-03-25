@@ -54,6 +54,10 @@ export function ViewingAreaVideo({
 
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
+  const youtubeBaseURL = 'https://www.youtube.com/watch?v=';
+  const videoURL = `${youtubeBaseURL}${controller.video}`;
+  controller.video = videoURL;
+
   useEffect(() => {
     const progressListener = (newTime: number) => {
       const currentTime = reactPlayerRef.current?.getCurrentTime();
