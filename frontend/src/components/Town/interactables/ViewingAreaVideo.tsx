@@ -45,6 +45,7 @@ export function ViewingAreaVideo({
 
   const youtubeBaseURL = 'https://www.youtube.com/watch?v=';
   const videoURL = `${youtubeBaseURL}${controller.video}`;
+  controller.video = videoURL;
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
