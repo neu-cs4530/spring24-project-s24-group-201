@@ -80,39 +80,6 @@ export function ViewingAreaVideo({
     };
   }, [controller]);
 
-  // Handler functions
-  const handlePlay = () => {
-    setPlaying(true);
-    controller.isPlaying = true;
-    townController.emitViewingAreaUpdate(controller);
-  };
-
-  const handlePause = () => {
-    setPlaying(false);
-    controller.isPlaying = false;
-    townController.emitViewingAreaUpdate(controller);
-  };
-
-  const handleEnded = () => {
-    setPlaying(false);
-    controller.isPlaying = false;
-
-    if (controller.queue.length > 0) {
-      const nextVideo = controller.queue.shift();
-      setVideoURL(nextVideo || '');
-    }
-
-    townController.emitViewingAreaUpdate(controller);
-  };
-
-  const handleProgress = (state: ProgressState) => {
-    const playedSeconds = Math.floor(state.playedSeconds);
-    if (playedSeconds !== controller.elapsedTimeSec) {
-      controller.elapsedTimeSec = playedSeconds;
-      townController.emitViewingAreaUpdate(controller);
-    }
-  };
-
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
@@ -144,10 +111,33 @@ export function ViewingAreaVideo({
               },
             }}
             playing={isPlaying}
-            onProgress={handleProgress}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onEnded={handleEnded}
+            onProgress={state => {
+              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
+                controller.elapsedTimeSec = state.playedSeconds;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPlay={() => {
+              if (!controller.isPlaying) {
+                controller.isPlaying = true;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onPause={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
+            onEnded={() => {
+              if (controller.isPlaying) {
+                controller.isPlaying = false;
+                if (controller.queue.length > 0) {
+                  controller.video = controller.queue.shift();
+                }
+                townController.emitViewingAreaUpdate(controller);
+              }
+            }}
             controls={true}
             width='100%'
             height='100%'
