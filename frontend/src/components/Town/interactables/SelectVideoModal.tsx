@@ -169,7 +169,7 @@ export default function SelectVideoModal({
           }}>
           <ModalFooter>
             {queue}
-            {isBeginButtonVisible && (
+            {isBeginButtonVisible && queue.length !== 0 && (
               <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
                 Begin
               </Button>
