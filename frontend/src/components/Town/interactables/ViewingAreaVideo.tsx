@@ -25,6 +25,10 @@ export class MockReactPlayer extends ReactPlayer {
   }
 }
 
+interface ProgressState {
+  playedSeconds: number;
+}
+
 /**
  * The ViewingAreaVideo component renders a ViewingArea's video, using the ReactPlayer component.
  * The URL property of the ReactPlayer is set to the ViewingAreaController's video property, and the isPlaying
@@ -50,13 +54,14 @@ export function ViewingAreaVideo({
   controller: ViewingAreaController;
 }): JSX.Element {
   const [isPlaying, setPlaying] = useState<boolean>(controller.isPlaying);
+  const [videoURL, setVideoURL] = useState<string>(controller.video || '');
   const townController = useTownController();
-
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
-  const youtubeBaseURL = 'https://www.youtube.com/watch?v=';
-  const videoURL = `${youtubeBaseURL}${controller.video}`;
-  controller.video = videoURL;
+  // Sync state with the controller video property
+  useEffect(() => {
+    return setVideoURL(controller.video || '');
+  }, [controller.video]);
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
@@ -67,11 +72,46 @@ export function ViewingAreaVideo({
     };
     controller.addListener('progressChange', progressListener);
     controller.addListener('playbackChange', setPlaying);
+
+    // The clean-up function
     return () => {
       controller.removeListener('playbackChange', setPlaying);
       controller.removeListener('progressChange', progressListener);
     };
   }, [controller]);
+
+  // Handler functions
+  const handlePlay = () => {
+    setPlaying(true);
+    controller.isPlaying = true; 
+    townController.emitViewingAreaUpdate(controller);
+  };
+
+  const handlePause = () => {
+    setPlaying(false);
+    controller.isPlaying = false; 
+    townController.emitViewingAreaUpdate(controller);
+  };
+
+  const handleEnded = () => {
+    setPlaying(false);
+    controller.isPlaying = false; 
+
+    if (controller.queue.length > 0) {
+      const nextVideo = controller.queue.shift();
+      setVideoURL(nextVideo || ''); 
+    }
+
+    townController.emitViewingAreaUpdate(controller);
+  };
+
+  const handleProgress = (state: ProgressState) => {
+    const playedSeconds = Math.floor(state.playedSeconds);
+    if (playedSeconds !== controller.elapsedTimeSec) {
+      controller.elapsedTimeSec = playedSeconds;
+      townController.emitViewingAreaUpdate(controller);
+    }
+  };
 
   return (
     <Container className='participant-wrapper'>
@@ -93,46 +133,21 @@ export function ViewingAreaVideo({
       <Flex direction='column'>
         <Box>
           <ReactPlayer
-            url={controller.video}
+            url={videoURL}
             ref={reactPlayerRef}
             config={{
               youtube: {
                 playerVars: {
-                  // disable skipping time via keyboard to avoid weirdness with chat, etc
                   disablekb: 1,
                   autoplay: 1,
-                  // modestbranding: 1,
                 },
               },
             }}
             playing={isPlaying}
-            onProgress={state => {
-              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-                controller.elapsedTimeSec = state.playedSeconds;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPlay={() => {
-              if (!controller.isPlaying) {
-                controller.isPlaying = true;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPause={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onEnded={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                if (controller.queue.length > 0) {
-                  controller.video = controller.queue.shift();
-                }
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
+            onProgress={handleProgress}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onEnded={handleEnded}
             controls={true}
             width='100%'
             height='100%'
