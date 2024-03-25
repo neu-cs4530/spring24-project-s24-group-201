@@ -55,7 +55,6 @@ export function ViewingAreaVideo({
   const reactPlayerRef = useRef<ReactPlayer>(null);
 
   useEffect(() => {
-    console.log(controller.queue);
     const progressListener = (newTime: number) => {
       const currentTime = reactPlayerRef.current?.getCurrentTime();
       if (currentTime !== undefined && Math.abs(currentTime - newTime) > ALLOWED_DRIFT) {
