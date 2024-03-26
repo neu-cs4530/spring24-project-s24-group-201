@@ -67,7 +67,9 @@ export default function SelectVideoModal({
   const handleSearch = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8081/api/youtube-search?query=${encodeURIComponent(searchQuery)}`,
+        `${process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL}/api/youtube-search?query=${encodeURIComponent(
+          searchQuery,
+        )}`,
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
