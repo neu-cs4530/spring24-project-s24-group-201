@@ -88,7 +88,7 @@ export function ViewingAreaVideo({
           <Heading as='h3'>
             <AccordionButton>
               <Box flex='1' textAlign='left'>
-                Leaderboard
+                Statistics
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -140,17 +140,17 @@ export function ViewingAreaVideo({
             }}
             controls={true}
             width='100%'
-            height='100%'
+            height='400%'
           />
         </Box>
         <Box
           style={{
             height: '400px',
-            overflowY: 'scroll',
+            overflowY: 'auto',
           }}>
           <div
             style={{
-              height: '100%',
+              height: '200%',
               display: 'flex',
               flexDirection: 'column',
             }}>

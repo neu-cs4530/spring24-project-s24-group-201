@@ -26,6 +26,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._id = id;
     this._userName = userName;
     this._location = location;
+    const friends: Array<string> = [];
   }
 
   set location(newLocation: PlayerLocation) {
