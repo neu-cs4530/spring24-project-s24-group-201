@@ -12,10 +12,6 @@ import ChatWindow from '../VideoCall/VideoFrontend/components/ChatWindow/ChatWin
 import clsx from 'clsx';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
-interface TownMapProps {
-  wrapper: number;
-}
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     chatWindowContainer: {
@@ -45,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function TownMap({ wrapper }: TownMapProps): JSX.Element {
+export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
   const { isChatWindowOpen } = useChatContext();
   const classes = useStyles();
@@ -87,36 +83,19 @@ export default function TownMap({ wrapper }: TownMapProps): JSX.Element {
   }, [coveyTownController]);
 
   // 0 represents ViewingAreaWrapper value for wrapper
-  if (wrapper === 0) {
-    return (
-      <div id='app-container'>
-        <NewConversationModal />
-        <ViewingAreaWrapper />
-        <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
-          <ChatWindow />
-        </aside>
+  return (
+    <div id='app-container'>
+      <NewConversationModal />
+      <ViewingAreaWrapper />
+      <GameAreaWrapper />
+      <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
+        <ChatWindow />
+      </aside>
 
-        <div id='map-container' />
-        <div id='social-container'>
-          <SocialSidebar />
-        </div>
+      <div id='map-container' />
+      <div id='social-container'>
+        <SocialSidebar />
       </div>
-    );
-  } else {
-    // anything else represents GameAreaWrapper value for wrapper
-    return (
-      <div id='app-container'>
-        <NewConversationModal />
-        <GameAreaWrapper />
-        <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
-          <ChatWindow />
-        </aside>
-
-        <div id='map-container' />
-        <div id='social-container'>
-          <SocialSidebar />
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
