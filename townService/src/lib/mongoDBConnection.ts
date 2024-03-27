@@ -1,5 +1,10 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
+interface FriendDocument {
+  playerId: string;
+  friends: string[];
+}
+
 // Ensure you have loaded environment variables here if you're using them
 const URI = process.env.MONGODB_URI || ''; // replace with your MongoDB URI stored in an environment variable
 
@@ -16,7 +21,6 @@ const client = new MongoClient(URI, {
 export async function connectToDatabase(): Promise<MongoClient> {
   try {
     await client.connect();
-    console.log('Connected to MongoDB');
     // Here you would typically return the client or the db instance
     return client;
   } catch (err) {
@@ -29,7 +33,13 @@ export async function connectToDatabase(): Promise<MongoClient> {
 // A function to close the database connection
 export async function closeDatabaseConnection() {
   await client.close();
-  console.log('Disconnected from MongoDB');
+}
+
+export async function removeFriend(playerId: string, friendId: string): Promise<void> {
+  const db = client.db('FriendsList');
+  const friendsCollection = db.collection<FriendDocument>('FriendsData');
+
+  await friendsCollection.updateOne({ playerId }, { $pull: { friends: friendId } });
 }
 
 // You can export the client directly if needed

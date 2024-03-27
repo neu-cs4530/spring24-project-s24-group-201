@@ -1,8 +1,9 @@
 import assert from 'assert';
+import { generateKey } from 'crypto';
 import EventEmitter from 'events';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
@@ -210,6 +211,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
+  private _getOtherPlayers(excludePlayerID: string): PlayerController[] {
+    return this._playersInternal.filter(player => player.id !== excludePlayerID);
+  }
+
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -405,10 +410,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerJoined', newPlayer => {
-      const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
+      const newPlayerObj = PlayerController.fromPlayerModel(
+        newPlayer, // This should be an object of type Player
+        this._getOtherPlayers.bind(this, newPlayer.id),
+      );
       this._players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
+
     /**
      * When a player disconnects from the town, update local state
      *
@@ -608,7 +617,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
         this._players = initialData.currentPlayers.map(eachPlayerModel =>
-          PlayerController.fromPlayerModel(eachPlayerModel),
+          PlayerController.fromPlayerModel(
+            eachPlayerModel,
+            this._getOtherPlayers.bind(this) as never,
+          ),
         );
 
         this._interactableControllers = [];

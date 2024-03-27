@@ -12,11 +12,13 @@ import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSoc
 import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
 import youtubeSearchRouter from './api/youtubeSearch';
+import friendsRoutes from './api/friendsRoutes';
 
 // Create the server instances
 const app = Express();
 app.use(CORS());
 app.use('/api', youtubeSearchRouter);
+app.use('/api', friendsRoutes);
 const server = http.createServer(app);
 const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: { origin: '*' },

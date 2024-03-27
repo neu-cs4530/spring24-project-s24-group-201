@@ -1,17 +1,23 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
+
 export const MOVEMENT_SPEED = 175;
+export const PROXIMITY_THRESHOLD = 50; // Define the proximity threshold
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
+  proximity: (nearbyPlayerID: string) => void;
 };
 
 export type PlayerGameObjects = {
   sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   label: Phaser.GameObjects.Text;
-  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
+  locationManagedByGameScene: boolean;
 };
+
+type OtherPlayersFunc = () => PlayerController[];
+
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
 
@@ -21,18 +27,26 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PlayerGameObjects;
 
-  constructor(id: string, userName: string, location: PlayerLocation) {
+  private readonly _getOtherPlayers: OtherPlayersFunc;
+
+  constructor(
+    id: string,
+    userName: string,
+    location: PlayerLocation,
+    getOtherPlayers: OtherPlayersFunc,
+  ) {
     super();
     this._id = id;
     this._userName = userName;
     this._location = location;
-    const friends: Array<string> = [];
+    this._getOtherPlayers = getOtherPlayers;
   }
 
   set location(newLocation: PlayerLocation) {
     this._location = newLocation;
     this._updateGameComponentLocation();
     this.emit('movement', newLocation);
+    this._checkForProximity();
   }
 
   get location(): PlayerLocation {
@@ -84,7 +98,47 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
   }
 
-  static fromPlayerModel(modelPlayer: PlayerModel): PlayerController {
-    return new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+  private _checkForProximity() {
+    const otherPlayers = this._getOtherPlayers();
+    otherPlayers.forEach(otherPlayer => {
+      if (otherPlayer.id !== this.id) {
+        const distance = Phaser.Math.Distance.Between(
+          this.location.x,
+          this.location.y,
+          otherPlayer.location.x,
+          otherPlayer.location.y,
+        );
+        if (distance < PROXIMITY_THRESHOLD) {
+          this.emit('proximity', otherPlayer.id);
+        }
+      }
+    });
+  }
+
+  // Within PlayerController class
+  public isNearOtherPlayer(otherPlayers: PlayerController[], proximityThreshold: number): boolean {
+    const currentPlayerPos = { x: this.location.x, y: this.location.y };
+    return otherPlayers.some(otherPlayer => {
+      if (otherPlayer.id !== this.id) {
+        const distance = Math.sqrt(
+          (currentPlayerPos.x - otherPlayer.location.x) ** 2 +
+            (currentPlayerPos.y - otherPlayer.location.y) ** 2,
+        );
+        return distance < proximityThreshold;
+      }
+      return false;
+    });
+  }
+
+  static fromPlayerModel(
+    modelPlayer: PlayerModel,
+    getOtherPlayers: OtherPlayersFunc,
+  ): PlayerController {
+    return new PlayerController(
+      modelPlayer.id,
+      modelPlayer.userName,
+      modelPlayer.location,
+      getOtherPlayers,
+    );
   }
 }
