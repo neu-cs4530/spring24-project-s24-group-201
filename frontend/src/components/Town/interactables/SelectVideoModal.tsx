@@ -170,7 +170,6 @@ export default function SelectVideoModal({
             createViewingArea();
           }}>
           <ModalFooter>
-            {queue}
             {isBeginButtonVisible && queue.length !== 0 && (
               <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
                 Begin
@@ -186,7 +185,11 @@ export default function SelectVideoModal({
               <Button
                 colorScheme='yellow'
                 mr={3}
-                onClick={() => (viewingAreaController.video = queue.shift())}>
+                onClick={() => {
+                  viewingAreaController.isPlaying = false;
+                  viewingAreaController.video = queue.shift();
+                  setQueue([...queue]);
+                }}>
                 Skip Video
               </Button>
             )}

@@ -25,10 +25,6 @@ export class MockReactPlayer extends ReactPlayer {
   }
 }
 
-interface ProgressState {
-  playedSeconds: number;
-}
-
 /**
  * The ViewingAreaVideo component renders a ViewingArea's video, using the ReactPlayer component.
  * The URL property of the ReactPlayer is set to the ViewingAreaController's video property, and the isPlaying
@@ -55,13 +51,9 @@ export function ViewingAreaVideo({
 }): JSX.Element {
   const [isPlaying, setPlaying] = useState<boolean>(controller.isPlaying);
   const [videoURL, setVideoURL] = useState<string>(controller.video || '');
+  const [queue, setQueue] = useState<string[]>(controller.queue || []);
   const townController = useTownController();
   const reactPlayerRef = useRef<ReactPlayer>(null);
-
-  // Sync state with the controller video property
-  useEffect(() => {
-    return setVideoURL(controller.video || '');
-  }, [controller.video]);
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
@@ -77,6 +69,23 @@ export function ViewingAreaVideo({
     return () => {
       controller.removeListener('playbackChange', setPlaying);
       controller.removeListener('progressChange', progressListener);
+    };
+  }, [controller]);
+
+  useEffect(() => {
+    const queueUpdater = (updatedQueue: string[]) => {
+      setQueue(updatedQueue);
+    };
+    const videoChangeQueueUpdater = (updatedVideo: string | undefined) => {
+      if (updatedVideo) {
+        setVideoURL(updatedVideo);
+      }
+    };
+    controller.addListener('queueChange', queueUpdater);
+    controller.addListener('videoChange', videoChangeQueueUpdater);
+    return () => {
+      controller.removeListener('queueChange', queueUpdater);
+      controller.removeListener('videoChange', videoChangeQueueUpdater);
     };
   }, [controller]);
 
@@ -96,7 +105,7 @@ export function ViewingAreaVideo({
           </Heading>
         </AccordionItem>
       </Accordion>
-      {controller.queue}
+      {queue}
       <Flex direction='column'>
         <Box>
           <ReactPlayer
@@ -132,8 +141,9 @@ export function ViewingAreaVideo({
             onEnded={() => {
               if (controller.isPlaying) {
                 controller.isPlaying = false;
-                if (controller.queue.length > 0) {
-                  controller.video = controller.queue.shift();
+                if (queue.length > 0) {
+                  controller.video = queue.shift();
+                  setQueue([...queue]);
                 }
                 townController.emitViewingAreaUpdate(controller);
               }
