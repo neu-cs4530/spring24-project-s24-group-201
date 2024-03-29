@@ -67,6 +67,20 @@ describe('ViewingArea', () => {
       });
       expect(testArea.video).toBeUndefined();
     });
+    it('Clears the queue property when the last occupant leaves', () => {
+      testArea.remove(newPlayer);
+      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+      expect(lastEmittedUpdate).toEqual({
+        id,
+        isPlaying,
+        elapsedTimeSec,
+        video: undefined,
+        occupants: [],
+        type: 'ViewingArea',
+        queue: [],
+      });
+      expect(testArea.queue).toEqual([]);
+    });
   });
   describe('add', () => {
     it('Adds the player to the occupants list', () => {
@@ -79,7 +93,7 @@ describe('ViewingArea', () => {
       expect(lastEmittedMovement.location.interactableID).toEqual(id);
     });
   });
-  test('toModel sets the ID, video, isPlaying, occupants, and elapsedTimeSec', () => {
+  test('toModel sets the ID, video, isPlaying, occupants, elapsedTimeSec, and queue', () => {
     const model = testArea.toModel();
     expect(model).toEqual({
       id,
@@ -91,7 +105,7 @@ describe('ViewingArea', () => {
       queue: [],
     });
   });
-  test('updateModel sets video, isPlaying and elapsedTimeSec', () => {
+  test('updateModel sets video, isPlaying, elapsedTimeSec, and queue', () => {
     testArea.updateModel({
       id: 'ignore',
       isPlaying: false,
@@ -99,12 +113,13 @@ describe('ViewingArea', () => {
       video: 'test2',
       occupants: [],
       type: 'ViewingArea',
-      queue: [],
+      queue: ['test1', 'test2'],
     });
     expect(testArea.isPlaying).toBe(false);
     expect(testArea.id).toBe(id);
     expect(testArea.elapsedTimeSec).toBe(150);
     expect(testArea.video).toBe('test2');
+    expect(testArea.queue).toEqual(['test1', 'test2']);
   });
   describe('fromMapObject', () => {
     it('Throws an error if the width or height are missing', () => {
@@ -131,6 +146,7 @@ describe('ViewingArea', () => {
       expect(val.elapsedTimeSec).toEqual(0);
       expect(val.video).toBeUndefined();
       expect(val.occupantsByID).toEqual([]);
+      expect(val.queue).toEqual([]);
     });
   });
 });
