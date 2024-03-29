@@ -68,6 +68,7 @@ export default class ViewingArea extends InteractableArea {
     super.remove(player);
     if (this._occupants.length === 0) {
       this._video = undefined;
+      this._queue = [];
       this._emitAreaChanged();
     }
   }
