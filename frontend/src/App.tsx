@@ -34,7 +34,7 @@ function App() {
     page = (
       <TownControllerContext.Provider value={townController}>
         <ChatProvider>
-          <TownMap wrapper={0} />
+          <TownMap />
           <VideoOverlay preferredMode='fullwidth' />
         </ChatProvider>
       </TownControllerContext.Provider>
@@ -110,7 +110,7 @@ function DebugApp(): JSX.Element {
     return (
       <TownControllerContext.Provider value={townController}>
         <ChatProvider>
-          <TownMap wrapper={1} />
+          <TownMap />
           <ToggleChatButton />
         </ChatProvider>
       </TownControllerContext.Provider>
