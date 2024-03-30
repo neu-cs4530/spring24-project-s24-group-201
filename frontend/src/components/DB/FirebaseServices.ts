@@ -6,17 +6,11 @@ import {
   where,
   getDoc,
   getDocs,
-  addDoc,
   setDoc,
   arrayRemove,
   arrayUnion,
   updateDoc,
   doc,
-  increment,
-  orderBy,
-  limit,
-  QuerySnapshot,
-  DocumentData,
 } from 'firebase/firestore';
 
 import { initializeApp } from 'firebase/app';
