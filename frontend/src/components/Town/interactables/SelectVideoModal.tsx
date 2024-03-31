@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ViewingAreaController from '../../../classes/interactable/ViewingAreaController';
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
+import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
 import ViewingArea from './ViewingArea';
 
 type SearchResultItem = {
@@ -189,6 +190,12 @@ export default function SelectVideoModal({
                 onClick={() => (viewingAreaController.video = queue.shift())}>
                 Skip Video
               </Button>
+            )}
+            {viewingAreaController.video && (
+              <ToggleLikeButton
+                videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
+                user={coveyTownController.userID}
+              />
             )}
             <Button onClick={closeModal}>Cancel</Button>
           </ModalFooter>
