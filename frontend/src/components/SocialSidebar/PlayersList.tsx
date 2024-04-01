@@ -3,7 +3,7 @@ import React from 'react';
 import { usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
 import PlayerName from './PlayerName';
-import AddFriendButton from '../../components/VideoCall/VideoFrontend/components/Buttons/AddFriend/AddFriendButton';
+import AddFriendButton from '../VideoCall/VideoFrontend/components/Buttons/AddFriend/AddFriendButton';
 
 export default function PlayersInTownList(): JSX.Element {
   const players = usePlayers();
