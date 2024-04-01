@@ -40,6 +40,11 @@ export interface LikeData {
   userIDs: string[];
 }
 
+export interface FriendData {
+  friendID: string;
+  friendSince: Date;
+}
+
 /**
  * Determines if a video exists in the 'likes' collection.
  *
@@ -127,4 +132,36 @@ export async function countLikes(videoID: string) {
     // Document does not exist
     return 0;
   }
+}
+
+/**
+ * Sends a friend request from one user to another.
+ *
+ * @param {string} userID The ID of the user sending the request.
+ * @param {string} friendID The ID of the user to become friends with.
+ */
+export async function sendFriendRequest(userID: string, friendID: string): Promise<void> {
+  const friendRef = doc(db, 'users', String(userID), 'friends', String(friendID));
+  await setDoc(friendRef, {
+    friendID: friendID,
+    friendSince: new Date(), // Set the current time as the friendship start
+  });
+}
+
+/**
+ * Checks if two users are friends.
+ *
+ * @param {string} userID The ID of the user.
+ * @param {string} friendID The ID of the potential friend.
+ * @returns {Promise<boolean>} True if they are friends, false otherwise.
+ */
+export async function areUsersFriends(userID: string, friendID: string): Promise<boolean> {
+  // if (typeof userID !== 'string' || typeof friendID !== 'string') {
+  //   console.error('UserID and FriendID must be strings', userID, friendID);
+  //   throw new Error('UserID and FriendID must be strings');
+  // }
+
+  const friendRef = doc(db, 'users', String(userID), 'friends', String(friendID));
+  const docSnap = await getDoc(friendRef);
+  return docSnap.exists();
 }
