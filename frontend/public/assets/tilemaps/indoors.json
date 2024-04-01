@@ -7,7 +7,7 @@
          "target":"..\/maps\/indoors2.json"
         }
     },
- "height":45,
+ "height":45, 
  "infinite":false,
  "layers":[
         {
