@@ -161,7 +161,7 @@ export async function areUsersFriends(userID: string, friendID: string): Promise
     throw new Error('UserID and FriendID must be strings');
   }
 
-  const friendRef = doc(db, 'users', userID, 'friends', friendID);
+  const friendRef = doc(db, 'users', String(userID), 'friends', String(friendID));
   const docSnap = await getDoc(friendRef);
   return docSnap.exists();
 }
