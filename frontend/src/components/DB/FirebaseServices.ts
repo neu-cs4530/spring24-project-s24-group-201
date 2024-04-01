@@ -156,10 +156,10 @@ export async function sendFriendRequest(userID: string, friendID: string): Promi
  * @returns {Promise<boolean>} True if they are friends, false otherwise.
  */
 export async function areUsersFriends(userID: string, friendID: string): Promise<boolean> {
-  if (typeof userID !== 'string' || typeof friendID !== 'string') {
-    console.error('UserID and FriendID must be strings', userID, friendID);
-    throw new Error('UserID and FriendID must be strings');
-  }
+  // if (typeof userID !== 'string' || typeof friendID !== 'string') {
+  //   console.error('UserID and FriendID must be strings', userID, friendID);
+  //   throw new Error('UserID and FriendID must be strings');
+  // }
 
   const friendRef = doc(db, 'users', String(userID), 'friends', String(friendID));
   const docSnap = await getDoc(friendRef);
