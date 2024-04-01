@@ -141,7 +141,7 @@ export async function countLikes(videoID: string) {
  * @param {string} friendID The ID of the user to become friends with.
  */
 export async function sendFriendRequest(userID: string, friendID: string): Promise<void> {
-  const friendRef = doc(db, 'users', userID, 'friends', friendID);
+  const friendRef = doc(db, 'users', String(userID), 'friends', String(friendID));
   await setDoc(friendRef, {
     friendID: friendID,
     friendSince: new Date(), // Set the current time as the friendship start
