@@ -17,7 +17,8 @@ export default function AddFriendButton(props: { userID?: string; friendID?: str
   }, [props.userID, props.friendID]);
 
   const handleAddFriend = async () => {
-    if (!props.userID || !props.friendID || isFriend) return; // Ensure userID and friendID are provided and they aren't already friends
+    if (!props.userID || !props.friendID || isFriend) 
+    return; // Ensure userID and friendID are provided and they aren't already friends
 
     await sendFriendRequest(props.userID, props.friendID);
     setIsFriend(true); // Update local state to reflect the new friendship status
