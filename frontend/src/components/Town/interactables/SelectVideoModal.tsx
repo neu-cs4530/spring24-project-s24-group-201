@@ -47,7 +47,6 @@ export default function SelectVideoModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
-  const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +93,6 @@ export default function SelectVideoModal({
   };
 
   const createViewingArea = useCallback(async () => {
-    setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
