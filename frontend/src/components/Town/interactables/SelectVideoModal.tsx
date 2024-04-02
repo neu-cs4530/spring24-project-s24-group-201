@@ -171,7 +171,7 @@ export default function SelectVideoModal({
             createViewingArea();
           }}>
           <ModalFooter>
-            {isBeginButtonVisible && queue.length !== 0 && (
+            {!viewingAreaController.video && queue.length !== 0 && (
               <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
                 Begin
               </Button>
