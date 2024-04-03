@@ -8,6 +8,8 @@ import {
   Container,
   Flex,
   Heading,
+  List,
+  ListItem,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -97,15 +99,20 @@ export function ViewingAreaVideo({
           <Heading as='h3'>
             <AccordionButton>
               <Box flex='1' textAlign='left'>
-                Leaderboard
+                Queue
               </Box>
               <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel>{/* <Statistics /> */}</AccordionPanel>
           </Heading>
+          <AccordionPanel>
+            <List aria-label='list of queue'>
+              {queue.map(video => {
+                return <ListItem key={video}>{video}</ListItem>;
+              })}
+            </List>
+          </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      {queue}
       <Flex direction='column'>
         <Box>
           <ReactPlayer
@@ -188,13 +195,10 @@ export function ViewingArea({
     viewingArea.name,
   );
   const [selectIsOpen, setSelectIsOpen] = useState(viewingAreaController.video === undefined);
-  const [viewingAreaVideoURL, setViewingAreaVideoURL] = useState(viewingAreaController.video);
   useEffect(() => {
     const setURL = (url: string | undefined) => {
       if (!url) {
         townController.interactableEmitter.emit('endIteraction', viewingAreaController);
-      } else {
-        setViewingAreaVideoURL(url);
       }
     };
     viewingAreaController.addListener('videoChange', setURL);
@@ -203,21 +207,6 @@ export function ViewingArea({
     };
   }, [viewingAreaController, townController]);
 
-  if (!viewingAreaVideoURL) {
-    return (
-      <SelectVideoModal
-        isOpen={selectIsOpen}
-        close={() => {
-          setSelectIsOpen(false);
-          // forces game to emit "viewingArea" event again so that
-          // repoening the modal works as expected
-          townController.interactEnd(viewingArea);
-        }}
-        viewingArea={viewingArea}
-        viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
-      />
-    );
-  }
   return (
     <SelectVideoModal
       isOpen={selectIsOpen}
