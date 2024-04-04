@@ -5,11 +5,9 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
+  Button,
   Center,
   Flex,
-  Heading,
-  List,
-  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -102,7 +100,7 @@ export function ViewingAreaVideo({
   return (
     <Accordion allowToggle defaultIndex={controller.video ? 0 : undefined}>
       <AccordionItem>
-        <AccordionButton _expanded={{ bg: 'linkedin', color: 'black' }}>
+        <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
           <span>Viewing Area: {controller.id}</span>
           <AccordionIcon />
         </AccordionButton>
@@ -110,55 +108,53 @@ export function ViewingAreaVideo({
           <Center>
             <Flex direction='column'>
               <Box>
-                {controller.video && (
-                  <ReactPlayer
-                    url={videoURL}
-                    ref={reactPlayerRef}
-                    config={{
-                      youtube: {
-                        playerVars: {
-                          disablekb: 1,
-                          autoplay: 1,
-                        },
+                <ReactPlayer
+                  url={videoURL}
+                  ref={reactPlayerRef}
+                  config={{
+                    youtube: {
+                      playerVars: {
+                        disablekb: 1,
+                        autoplay: 1,
                       },
-                    }}
-                    playing={isPlaying}
-                    onProgress={state => {
-                      if (
-                        state.playedSeconds != 0 &&
-                        state.playedSeconds != controller.elapsedTimeSec
-                      ) {
-                        controller.elapsedTimeSec = state.playedSeconds;
-                        townController.emitViewingAreaUpdate(controller);
+                    },
+                  }}
+                  playing={isPlaying}
+                  onProgress={state => {
+                    if (
+                      state.playedSeconds != 0 &&
+                      state.playedSeconds != controller.elapsedTimeSec
+                    ) {
+                      controller.elapsedTimeSec = state.playedSeconds;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onPlay={() => {
+                    if (!controller.isPlaying) {
+                      controller.isPlaying = true;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onPause={() => {
+                    if (controller.isPlaying) {
+                      controller.isPlaying = false;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onEnded={() => {
+                    if (controller.isPlaying) {
+                      controller.isPlaying = false;
+                      if (queue.length > 0) {
+                        controller.video = queue.shift();
+                        setQueue([...queue]);
                       }
-                    }}
-                    onPlay={() => {
-                      if (!controller.isPlaying) {
-                        controller.isPlaying = true;
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    onPause={() => {
-                      if (controller.isPlaying) {
-                        controller.isPlaying = false;
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    onEnded={() => {
-                      if (controller.isPlaying) {
-                        controller.isPlaying = false;
-                        if (queue.length > 0) {
-                          controller.video = queue.shift();
-                          setQueue([...queue]);
-                        }
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    controls={true}
-                    width='50vw' // Adjust width as needed
-                    height='40vh' // Adjust height as needed
-                  />
-                )}
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  controls={true}
+                  width='50vw' // Adjust width as needed
+                  height='40vh' // Adjust height as needed
+                />
               </Box>
               <Box alignSelf='flex-end'>
                 {controller.video && (
@@ -166,6 +162,18 @@ export function ViewingAreaVideo({
                     videoID={controller.video.split('v=')[1].split('&')[0]}
                     user={townController.userID}
                   />
+                )}
+                {queue.length !== 0 && (
+                  <Button
+                    colorScheme='yellow'
+                    mr={3}
+                    onClick={() => {
+                      controller.isPlaying = false;
+                      controller.video = queue.shift();
+                      setQueue([...queue]);
+                    }}>
+                    Skip Video
+                  </Button>
                 )}
               </Box>
               <Box
@@ -215,7 +223,7 @@ export function ViewingArea({
   }, [viewingAreaController, townController]);
 
   return (
-    <>
+    <Flex>
       <Modal
         isOpen={selectIsOpen}
         onClose={() => {
@@ -245,7 +253,7 @@ export function ViewingArea({
           <ModalFooter>{/* Add any footer buttons or actions here */}</ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </Flex>
   );
 }
 

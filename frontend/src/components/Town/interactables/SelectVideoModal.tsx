@@ -6,7 +6,7 @@ import {
   AccordionPanel,
   Box,
   Button,
-  Center,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -31,7 +31,6 @@ type SearchResultItem = {
 
 export default function SelectVideoModal({
   isOpen,
-  close,
   viewingArea,
 }: {
   isOpen: boolean;
@@ -57,11 +56,6 @@ export default function SelectVideoModal({
       coveyTownController.unPause();
     }
   }, [coveyTownController, isOpen, viewingAreaController, queue]);
-
-  const closeModal = useCallback(() => {
-    coveyTownController.unPause();
-    close();
-  }, [coveyTownController, close]);
 
   const toast = useToast();
 
@@ -132,98 +126,88 @@ export default function SelectVideoModal({
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
-    <Center h='100vh'>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <h2>
-            <AccordionButton _expanded={{ bg: 'tomato', color: 'black' }}>
-              <span>Pick a video to watch in {viewingAreaController?.id}</span>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <FormControl mt={4} display='flex' alignItems='center'>
-              <FormLabel htmlFor='search'>Search for Videos</FormLabel>
+    <Accordion allowToggle>
+      <AccordionItem>
+        <h2>
+          <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
+            <span>Pick a video to watch in {viewingAreaController?.id}</span>
+            <AccordionIcon />
+          </AccordionButton>
+        </h2>
+        <AccordionPanel pb={4}>
+          <FormControl mt={4} alignItems='center'>
+            <FormLabel htmlFor='search'>Search for Videos</FormLabel>
+            <Flex>
               <Input
                 id='search'
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder='Type to search YouTube videos'
               />
-              <Button ml={2} colorScheme='blue' onClick={handleSearch}>
+              <Button colorScheme='blue' onClick={handleSearch}>
                 Search
               </Button>
-            </FormControl>
-            {searchResults.length > 0 && (
-              <Select
-                placeholder='Select dropdown to see results'
-                onChange={event => handleSelectVideo(event.target.value)}
-                mt={2}>
-                {searchResults.map(item => (
-                  <option key={item.id.videoId} value={item.id.videoId}>
-                    {item.snippet.title}
-                  </option>
-                ))}
-              </Select>
-            )}
-            <FormControl>
-              <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
+            </Flex>
+          </FormControl>
+          {searchResults.length > 0 && (
+            <Select
+              placeholder='Select dropdown to see results'
+              onChange={event => handleSelectVideo(event.target.value)}
+              mt={2}>
+              {searchResults.map(item => (
+                <option key={item.id.videoId} value={item.id.videoId}>
+                  {item.snippet.title}
+                </option>
+              ))}
+            </Select>
+          )}
+          <FormControl mt={2}>
+            <FormLabel htmlFor='video'>Here is your selected video: </FormLabel>
+            <Flex>
               <Input
                 id='video'
                 name='video'
                 value={video}
                 onChange={e => setVideo(e.target.value)}
               />
-            </FormControl>
-            <form
-              onSubmit={ev => {
-                ev.preventDefault();
-                createViewingArea();
-              }}>
-              <ModalFooter mt={4}>
-                {isBeginButtonVisible && queue.length !== 0 && (
-                  <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-                    Begin
-                  </Button>
-                )}
-                <Button
-                  colorScheme='green'
-                  mr={3}
-                  onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
-                  Add to queue
+              <Button
+                colorScheme='green'
+                mr={3}
+                onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+                Add to queue
+              </Button>
+            </Flex>
+          </FormControl>
+          <form
+            onSubmit={ev => {
+              ev.preventDefault();
+              createViewingArea();
+            }}>
+            <ModalFooter mt={4}>
+              {isBeginButtonVisible && queue.length !== 0 && (
+                <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
+                  Begin
                 </Button>
-                {queue.length !== 0 && (
-                  <Button
-                    colorScheme='yellow'
-                    mr={3}
-                    onClick={() => {
-                      viewingAreaController.isPlaying = false;
-                      viewingAreaController.video = queue.shift();
-                      setQueue([...queue]);
-                    }}>
-                    Skip Video
-                  </Button>
-                )}
-              </ModalFooter>
-            </form>
-            <Heading as='h3' mt={4}>
-              <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
-                <Box flex='1' textAlign='left'>
-                  Queue
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </Heading>
-            <AccordionPanel>
-              <UnorderedList aria-label='list of queue'>
-                {queue.map(videoName => {
-                  return <ListItem key={videoName}>{videoName}</ListItem>;
-                })}
-              </UnorderedList>
-            </AccordionPanel>
+              )}
+            </ModalFooter>
+          </form>
+          <Heading as='h3' mt={4}>
+            <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
+              <Box flex='1' textAlign='left'>
+                Queue
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </Heading>
+          <AccordionPanel>
+            <UnorderedList aria-label='list of queue'>
+              {queue.map(videoName => {
+                return <ListItem key={videoName}>{videoName}</ListItem>;
+              })}
+            </UnorderedList>
           </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </Center>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
