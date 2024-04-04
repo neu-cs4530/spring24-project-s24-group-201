@@ -11,10 +11,10 @@ import {
   FormLabel,
   Heading,
   Input,
-  List,
   ListItem,
   ModalFooter,
   Select,
+  UnorderedList,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -136,7 +136,7 @@ export default function SelectVideoModal({
       <Accordion allowToggle>
         <AccordionItem>
           <h2>
-            <AccordionButton _expanded={{ bg: 'tomato', color: 'white' }}>
+            <AccordionButton _expanded={{ bg: 'tomato', color: 'black' }}>
               <span>Pick a video to watch in {viewingAreaController?.id}</span>
               <AccordionIcon />
             </AccordionButton>
@@ -156,7 +156,7 @@ export default function SelectVideoModal({
             </FormControl>
             {searchResults.length > 0 && (
               <Select
-                placeholder='Click dropdown to see results'
+                placeholder='Select dropdown to see results'
                 onChange={event => handleSelectVideo(event.target.value)}
                 mt={2}>
                 {searchResults.map(item => (
@@ -204,11 +204,10 @@ export default function SelectVideoModal({
                     Skip Video
                   </Button>
                 )}
-                <Button onClick={closeModal}>Cancel</Button>
               </ModalFooter>
             </form>
             <Heading as='h3' mt={4}>
-              <AccordionButton _expanded={{ bg: 'tomato', color: 'white' }}>
+              <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
                 <Box flex='1' textAlign='left'>
                   Queue
                 </Box>
@@ -216,11 +215,11 @@ export default function SelectVideoModal({
               </AccordionButton>
             </Heading>
             <AccordionPanel>
-              <List aria-label='list of queue'>
+              <UnorderedList aria-label='list of queue'>
                 {queue.map(videoName => {
                   return <ListItem key={videoName}>{videoName}</ListItem>;
                 })}
-              </List>
+              </UnorderedList>
             </AccordionPanel>
           </AccordionPanel>
         </AccordionItem>

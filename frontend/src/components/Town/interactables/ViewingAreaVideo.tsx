@@ -102,7 +102,7 @@ export function ViewingAreaVideo({
   return (
     <Accordion allowToggle defaultIndex={controller.video ? 0 : undefined}>
       <AccordionItem>
-        <AccordionButton _expanded={{ bg: 'tomato', color: 'white' }}>
+        <AccordionButton _expanded={{ bg: 'linkedin', color: 'black' }}>
           <span>Viewing Area: {controller.id}</span>
           <AccordionIcon />
         </AccordionButton>
@@ -246,23 +246,6 @@ export function ViewingArea({
         </ModalContent>
       </Modal>
     </>
-    // <Flex height='100vh'>
-    //   <Box flex='1'>
-    //     <SelectVideoModal
-    //       isOpen={selectIsOpen}
-    //       close={() => {
-    //         setSelectIsOpen(false);
-    //         // forces game to emit "viewingArea" event again so that
-    //         // repoening the modal works as expected
-    //         townController.interactEnd(viewingArea);
-    //       }}
-    //       viewingArea={viewingArea}
-    //     />
-    //   </Box>
-    //   <Box flex='1'>
-    //     <ViewingAreaVideo controller={viewingAreaController}></ViewingAreaVideo>
-    //   </Box>
-    // </Flex>
   );
 }
 
