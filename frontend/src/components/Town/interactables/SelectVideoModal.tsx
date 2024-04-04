@@ -126,7 +126,7 @@ export default function SelectVideoModal({
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
         <h2>
           <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>

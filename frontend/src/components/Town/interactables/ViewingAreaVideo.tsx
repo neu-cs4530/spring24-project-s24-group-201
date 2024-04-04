@@ -98,7 +98,7 @@ export function ViewingAreaVideo({
   }, [controller]);
 
   return (
-    <Accordion allowToggle defaultIndex={controller.video ? 0 : undefined}>
+    <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
         <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
           <span>Viewing Area: {controller.id}</span>
@@ -106,79 +106,81 @@ export function ViewingAreaVideo({
         </AccordionButton>
         <AccordionPanel>
           <Center>
-            <Flex direction='column'>
-              <Box>
-                <ReactPlayer
-                  url={videoURL}
-                  ref={reactPlayerRef}
-                  config={{
-                    youtube: {
-                      playerVars: {
-                        disablekb: 1,
-                        autoplay: 1,
+            <Flex>
+              <Flex direction='column'>
+                <Box mr={10}>
+                  <ReactPlayer
+                    url={videoURL}
+                    ref={reactPlayerRef}
+                    config={{
+                      youtube: {
+                        playerVars: {
+                          disablekb: 1,
+                          autoplay: 1,
+                        },
                       },
-                    },
-                  }}
-                  playing={isPlaying}
-                  onProgress={state => {
-                    if (
-                      state.playedSeconds != 0 &&
-                      state.playedSeconds != controller.elapsedTimeSec
-                    ) {
-                      controller.elapsedTimeSec = state.playedSeconds;
-                      townController.emitViewingAreaUpdate(controller);
-                    }
-                  }}
-                  onPlay={() => {
-                    if (!controller.isPlaying) {
-                      controller.isPlaying = true;
-                      townController.emitViewingAreaUpdate(controller);
-                    }
-                  }}
-                  onPause={() => {
-                    if (controller.isPlaying) {
-                      controller.isPlaying = false;
-                      townController.emitViewingAreaUpdate(controller);
-                    }
-                  }}
-                  onEnded={() => {
-                    if (controller.isPlaying) {
-                      controller.isPlaying = false;
-                      if (queue.length > 0) {
+                    }}
+                    playing={isPlaying}
+                    onProgress={state => {
+                      if (
+                        state.playedSeconds != 0 &&
+                        state.playedSeconds != controller.elapsedTimeSec
+                      ) {
+                        controller.elapsedTimeSec = state.playedSeconds;
+                        townController.emitViewingAreaUpdate(controller);
+                      }
+                    }}
+                    onPlay={() => {
+                      if (!controller.isPlaying) {
+                        controller.isPlaying = true;
+                        townController.emitViewingAreaUpdate(controller);
+                      }
+                    }}
+                    onPause={() => {
+                      if (controller.isPlaying) {
+                        controller.isPlaying = false;
+                        townController.emitViewingAreaUpdate(controller);
+                      }
+                    }}
+                    onEnded={() => {
+                      if (controller.isPlaying) {
+                        controller.isPlaying = false;
+                        if (queue.length > 0) {
+                          controller.video = queue.shift();
+                          setQueue([...queue]);
+                        }
+                        townController.emitViewingAreaUpdate(controller);
+                      }
+                    }}
+                    controls={true}
+                    width='50vw' // Adjust width as needed
+                    height='40vh' // Adjust height as needed
+                  />
+                </Box>
+                <Box alignSelf='flex-end' mr={10}>
+                  {controller.video && (
+                    <ToggleLikeButton
+                      videoID={controller.video.split('v=')[1].split('&')[0]}
+                      user={townController.userID}
+                    />
+                  )}
+                  {queue.length !== 0 && (
+                    <Button
+                      colorScheme='yellow'
+                      mr={3}
+                      onClick={() => {
+                        controller.isPlaying = false;
                         controller.video = queue.shift();
                         setQueue([...queue]);
-                      }
-                      townController.emitViewingAreaUpdate(controller);
-                    }
-                  }}
-                  controls={true}
-                  width='50vw' // Adjust width as needed
-                  height='40vh' // Adjust height as needed
-                />
-              </Box>
-              <Box alignSelf='flex-end'>
-                {controller.video && (
-                  <ToggleLikeButton
-                    videoID={controller.video.split('v=')[1].split('&')[0]}
-                    user={townController.userID}
-                  />
-                )}
-                {queue.length !== 0 && (
-                  <Button
-                    colorScheme='yellow'
-                    mr={3}
-                    onClick={() => {
-                      controller.isPlaying = false;
-                      controller.video = queue.shift();
-                      setQueue([...queue]);
-                    }}>
-                    Skip Video
-                  </Button>
-                )}
-              </Box>
+                      }}>
+                      Skip Video
+                    </Button>
+                  )}
+                </Box>
+              </Flex>
               <Box
-                mt={4}
                 height='400px'
+                width='800px'
                 overflowY='scroll'
                 style={{
                   display: 'flex',
