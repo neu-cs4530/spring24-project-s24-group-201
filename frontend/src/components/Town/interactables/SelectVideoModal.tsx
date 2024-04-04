@@ -142,7 +142,7 @@ export default function SelectVideoModal({
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <FormControl mt={4}>
+            <FormControl mt={4} display='flex' alignItems='center'>
               <FormLabel htmlFor='search'>Search for Videos</FormLabel>
               <Input
                 id='search'
@@ -150,20 +150,21 @@ export default function SelectVideoModal({
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder='Type to search YouTube videos'
               />
-              <Button mt={2} colorScheme='blue' onClick={handleSearch}>
+              <Button ml={2} colorScheme='blue' onClick={handleSearch}>
                 Search
               </Button>
-              <List spacing={3}>
-                {searchResults.map(item => (
-                  <ListItem
-                    key={item.id.videoId}
-                    cursor='pointer'
-                    onClick={() => handleSelectVideo(item.id.videoId)}>
-                    {item.snippet.title}
-                  </ListItem>
-                ))}
-              </List>
             </FormControl>
+            <List spacing={3}>
+              {searchResults.map(item => (
+                <ListItem
+                  key={item.id.videoId}
+                  cursor='pointer'
+                  onClick={() => handleSelectVideo(item.id.videoId)}>
+                  {item.snippet.title}
+                </ListItem>
+              ))}
+            </List>
+
             <FormControl>
               <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
               <Input
