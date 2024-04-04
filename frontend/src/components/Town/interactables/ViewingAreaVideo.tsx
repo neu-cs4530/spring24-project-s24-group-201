@@ -100,7 +100,7 @@ export function ViewingAreaVideo({
   return (
     <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
-        <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
+        <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
           <span>Viewing Area: {controller.id}</span>
           <AccordionIcon />
         </AccordionButton>
@@ -157,7 +157,7 @@ export function ViewingAreaVideo({
                     height='40vh' // Adjust height as needed
                   />
                 </Box>
-                <Box alignSelf='flex-end' mr={10}>
+                <Box alignSelf='flex-end' mr={7} mt={2}>
                   {controller.video && (
                     <ToggleLikeButton
                       videoID={controller.video.split('v=')[1].split('&')[0]}
@@ -180,7 +180,7 @@ export function ViewingAreaVideo({
               </Flex>
               <Box
                 height='400px'
-                width='800px'
+                width='600px'
                 overflowY='scroll'
                 style={{
                   display: 'flex',
@@ -237,7 +237,10 @@ export function ViewingArea({
         size='full'>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Pick a video to watch in {viewingAreaController?.id}</ModalHeader>
+          <ModalHeader fontFamily='heading' color='black' bg='white'>
+            Welcome to the YouTube Watch Party
+          </ModalHeader>
+
           <ModalCloseButton />
           <ModalBody>
             <SelectVideoModal

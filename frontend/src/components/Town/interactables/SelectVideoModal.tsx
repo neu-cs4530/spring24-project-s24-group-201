@@ -129,13 +129,13 @@ export default function SelectVideoModal({
     <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
         <h2>
-          <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
-            <span>Pick a video to watch in {viewingAreaController?.id}</span>
+          <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+            <span>Pick a video to watch</span>
             <AccordionIcon />
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <FormControl mt={4} alignItems='center'>
+          <FormControl alignItems='center'>
             <FormLabel htmlFor='search'>Search for Videos</FormLabel>
             <Flex>
               <Input
@@ -144,14 +144,15 @@ export default function SelectVideoModal({
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder='Type to search YouTube videos'
               />
-              <Button colorScheme='blue' onClick={handleSearch}>
+              <Button colorScheme='blue' onClick={handleSearch} ml={1}>
                 Search
               </Button>
             </Flex>
           </FormControl>
           {searchResults.length > 0 && (
             <Select
-              placeholder='Select dropdown to see results'
+              variant='filled'
+              placeholder='Select this dropdown to see results'
               onChange={event => handleSelectVideo(event.target.value)}
               mt={2}>
               {searchResults.map(item => (
@@ -161,7 +162,7 @@ export default function SelectVideoModal({
               ))}
             </Select>
           )}
-          <FormControl mt={2}>
+          <FormControl mt={3}>
             <FormLabel htmlFor='video'>Here is your selected video: </FormLabel>
             <Flex>
               <Input
@@ -171,7 +172,8 @@ export default function SelectVideoModal({
                 onChange={e => setVideo(e.target.value)}
               />
               <Button
-                colorScheme='green'
+                ml={1}
+                colorScheme='blue'
                 mr={3}
                 onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
                 Add to queue
@@ -183,16 +185,21 @@ export default function SelectVideoModal({
               ev.preventDefault();
               createViewingArea();
             }}>
-            <ModalFooter mt={4}>
+            <ModalFooter mt={4} justifyContent='center'>
               {isBeginButtonVisible && queue.length !== 0 && (
-                <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-                  Begin
+                <Button
+                  colorScheme='whatsapp'
+                  mr={3}
+                  onClick={createViewingArea}
+                  fontWeight='bold'
+                  color='black'>
+                  Press here to start your Watch Party
                 </Button>
               )}
             </ModalFooter>
           </form>
           <Heading as='h3' mt={4}>
-            <AccordionButton _expanded={{ bg: 'black', color: 'white' }}>
+            <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
               <Box flex='1' textAlign='left'>
                 Queue
               </Box>
