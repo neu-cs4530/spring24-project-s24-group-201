@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Container,
+  Center,
   Flex,
   Heading,
   List,
@@ -18,7 +18,6 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
-import ChatChannel from './ChatChannel';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -92,90 +91,84 @@ export function ViewingAreaVideo({
   }, [controller]);
 
   return (
-    <Container className='participant-wrapper'>
-      Viewing Area: {controller.id}
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Queue
+    <Accordion allowToggle>
+      <AccordionItem>
+        <AccordionButton>
+          <span>Viewing Area: {controller.id}</span>
+          <AccordionIcon />
+        </AccordionButton>
+        <Heading as='h3'>
+          <AccordionButton>
+            <Box flex='1' textAlign='left'>
+              Queue
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+        </Heading>
+        <AccordionPanel>
+          <List aria-label='list of queue'>
+            {queue.map(video => {
+              return <ListItem key={video}>{video}</ListItem>;
+            })}
+          </List>
+        </AccordionPanel>
+        <AccordionPanel>
+          <Center>
+            <Flex direction='column'>
+              <Box>
+                <ReactPlayer
+                  url={videoURL}
+                  ref={reactPlayerRef}
+                  config={{
+                    youtube: {
+                      playerVars: {
+                        disablekb: 1,
+                        autoplay: 1,
+                      },
+                    },
+                  }}
+                  playing={isPlaying}
+                  onProgress={state => {
+                    if (
+                      state.playedSeconds != 0 &&
+                      state.playedSeconds != controller.elapsedTimeSec
+                    ) {
+                      controller.elapsedTimeSec = state.playedSeconds;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onPlay={() => {
+                    if (!controller.isPlaying) {
+                      controller.isPlaying = true;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onPause={() => {
+                    if (controller.isPlaying) {
+                      controller.isPlaying = false;
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  onEnded={() => {
+                    if (controller.isPlaying) {
+                      controller.isPlaying = false;
+                      if (queue.length > 0) {
+                        controller.video = queue.shift();
+                        setQueue([...queue]);
+                      }
+                      townController.emitViewingAreaUpdate(controller);
+                    }
+                  }}
+                  controls={true}
+                  width='50vw' // Adjust width as needed
+                  height='40vh' // Adjust height as needed
+                />
               </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <List aria-label='list of queue'>
-              {queue.map(video => {
-                return <ListItem key={video}>{video}</ListItem>;
-              })}
-            </List>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-      <Flex direction='column'>
-        <Box>
-          <ReactPlayer
-            url={videoURL}
-            ref={reactPlayerRef}
-            config={{
-              youtube: {
-                playerVars: {
-                  disablekb: 1,
-                  autoplay: 1,
-                },
-              },
-            }}
-            playing={isPlaying}
-            onProgress={state => {
-              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-                controller.elapsedTimeSec = state.playedSeconds;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPlay={() => {
-              if (!controller.isPlaying) {
-                controller.isPlaying = true;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPause={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onEnded={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                if (queue.length > 0) {
-                  controller.video = queue.shift();
-                  setQueue([...queue]);
-                }
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            controls={true}
-            width='100%'
-            height='100%'
-          />
-        </Box>
-        <Box
-          style={{
-            height: '400px',
-            overflowY: 'scroll',
-          }}>
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <ChatChannel interactableID={controller.id} />
-          </div>
-        </Box>
-      </Flex>
-    </Container>
+            </Flex>
+          </Center>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
@@ -208,17 +201,19 @@ export function ViewingArea({
   }, [viewingAreaController, townController]);
 
   return (
-    <SelectVideoModal
-      isOpen={selectIsOpen}
-      close={() => {
-        setSelectIsOpen(false);
-        // forces game to emit "viewingArea" event again so that
-        // repoening the modal works as expected
-        townController.interactEnd(viewingArea);
-      }}
-      viewingArea={viewingArea}
-      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
-    />
+    <>
+      <SelectVideoModal
+        isOpen={selectIsOpen}
+        close={() => {
+          setSelectIsOpen(false);
+          // forces game to emit "viewingArea" event again so that
+          // repoening the modal works as expected
+          townController.interactEnd(viewingArea);
+        }}
+        viewingArea={viewingArea}
+      />
+      <ViewingAreaVideo controller={viewingAreaController}></ViewingAreaVideo>
+    </>
   );
 }
 

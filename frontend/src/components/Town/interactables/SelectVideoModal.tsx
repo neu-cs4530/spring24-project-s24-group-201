@@ -1,17 +1,18 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
   Button,
+  Center,
   FormControl,
   FormLabel,
   Input,
   List,
   ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
   ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
+import ChatChannel from './ChatChannel';
 import ViewingArea from './ViewingArea';
 
 type SearchResultItem = {
@@ -31,12 +33,10 @@ export default function SelectVideoModal({
   isOpen,
   close,
   viewingArea,
-  viewingVideo,
 }: {
   isOpen: boolean;
   close: () => void;
   viewingArea: ViewingArea;
-  viewingVideo: JSX.Element;
 }): JSX.Element {
   const coveyTownController = useTownController();
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
@@ -132,79 +132,102 @@ export default function SelectVideoModal({
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
-    <Modal isOpen={isOpen} onClose={closeModal}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Pick a video to watch in {viewingAreaController?.id}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <FormControl mt={4}>
-            <FormLabel htmlFor='search'>Search for Videos</FormLabel>
-            <Input
-              id='search'
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder='Type to search YouTube videos'
-            />
-            <Button mt={2} colorScheme='blue' onClick={handleSearch}>
-              Search
-            </Button>
-            <List spacing={3}>
-              {searchResults.map(item => (
-                <ListItem
-                  key={item.id.videoId}
-                  cursor='pointer'
-                  onClick={() => handleSelectVideo(item.id.videoId)}>
-                  {item.snippet.title}
-                </ListItem>
-              ))}
-            </List>
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
-            <Input id='video' name='video' value={video} onChange={e => setVideo(e.target.value)} />
-          </FormControl>
-        </ModalBody>
-        <form
-          onSubmit={ev => {
-            ev.preventDefault();
-            createViewingArea();
-          }}>
-          <ModalFooter>
-            {isBeginButtonVisible && queue.length !== 0 && (
-              <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-                Begin
-              </Button>
-            )}
-            <Button
-              colorScheme='green'
-              mr={3}
-              onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
-              Add to queue
-            </Button>
-            {queue.length !== 0 && (
-              <Button
-                colorScheme='yellow'
-                mr={3}
-                onClick={() => {
-                  viewingAreaController.isPlaying = false;
-                  viewingAreaController.video = queue.shift();
-                  setQueue([...queue]);
-                }}>
-                Skip Video
-              </Button>
-            )}
-            {viewingAreaController.video && (
-              <ToggleLikeButton
-                videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
-                user={coveyTownController.userID}
+    <Center h='100vh'>
+      <Accordion allowToggle>
+        <AccordionItem>
+          <h2>
+            <AccordionButton>
+              <span>Pick a video to watch in {viewingAreaController?.id}</span>
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <FormControl mt={4}>
+              <FormLabel htmlFor='search'>Search for Videos</FormLabel>
+              <Input
+                id='search'
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder='Type to search YouTube videos'
               />
-            )}
-            <Button onClick={closeModal}>Cancel</Button>
-          </ModalFooter>
-        </form>
-        {viewingVideo}
-      </ModalContent>
-    </Modal>
+              <Button mt={2} colorScheme='blue' onClick={handleSearch}>
+                Search
+              </Button>
+              <List spacing={3}>
+                {searchResults.map(item => (
+                  <ListItem
+                    key={item.id.videoId}
+                    cursor='pointer'
+                    onClick={() => handleSelectVideo(item.id.videoId)}>
+                    {item.snippet.title}
+                  </ListItem>
+                ))}
+              </List>
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
+              <Input
+                id='video'
+                name='video'
+                value={video}
+                onChange={e => setVideo(e.target.value)}
+              />
+            </FormControl>
+            <form
+              onSubmit={ev => {
+                ev.preventDefault();
+                createViewingArea();
+              }}>
+              <ModalFooter>
+                {isBeginButtonVisible && queue.length !== 0 && (
+                  <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
+                    Begin
+                  </Button>
+                )}
+                <Button
+                  colorScheme='green'
+                  mr={3}
+                  onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+                  Add to queue
+                </Button>
+                {queue.length !== 0 && (
+                  <Button
+                    colorScheme='yellow'
+                    mr={3}
+                    onClick={() => {
+                      viewingAreaController.isPlaying = false;
+                      viewingAreaController.video = queue.shift();
+                      setQueue([...queue]);
+                    }}>
+                    Skip Video
+                  </Button>
+                )}
+                {viewingAreaController.video && (
+                  <ToggleLikeButton
+                    videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
+                    user={coveyTownController.userID}
+                  />
+                )}
+                <Button onClick={closeModal}>Cancel</Button>
+              </ModalFooter>
+            </form>
+            <Box
+              style={{
+                height: '400px',
+                overflowY: 'scroll',
+              }}>
+              <div
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                <ChatChannel interactableID={viewingAreaController.id} />
+              </div>
+            </Box>
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
+    </Center>
   );
 }
