@@ -9,18 +9,18 @@ import {
   Center,
   FormControl,
   FormLabel,
+  Heading,
   Input,
   List,
   ListItem,
   ModalFooter,
+  Select,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import ViewingAreaController from '../../../classes/interactable/ViewingAreaController';
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
-import ChatChannel from './ChatChannel';
 import ViewingArea from './ViewingArea';
 
 type SearchResultItem = {
@@ -136,7 +136,7 @@ export default function SelectVideoModal({
       <Accordion allowToggle>
         <AccordionItem>
           <h2>
-            <AccordionButton>
+            <AccordionButton _expanded={{ bg: 'tomato', color: 'white' }}>
               <span>Pick a video to watch in {viewingAreaController?.id}</span>
               <AccordionIcon />
             </AccordionButton>
@@ -154,17 +154,18 @@ export default function SelectVideoModal({
                 Search
               </Button>
             </FormControl>
-            <List spacing={3}>
-              {searchResults.map(item => (
-                <ListItem
-                  key={item.id.videoId}
-                  cursor='pointer'
-                  onClick={() => handleSelectVideo(item.id.videoId)}>
-                  {item.snippet.title}
-                </ListItem>
-              ))}
-            </List>
-
+            {searchResults.length > 0 && (
+              <Select
+                placeholder='Click dropdown to see results'
+                onChange={event => handleSelectVideo(event.target.value)}
+                mt={2}>
+                {searchResults.map(item => (
+                  <option key={item.id.videoId} value={item.id.videoId}>
+                    {item.snippet.title}
+                  </option>
+                ))}
+              </Select>
+            )}
             <FormControl>
               <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
               <Input
@@ -179,7 +180,7 @@ export default function SelectVideoModal({
                 ev.preventDefault();
                 createViewingArea();
               }}>
-              <ModalFooter>
+              <ModalFooter mt={4}>
                 {isBeginButtonVisible && queue.length !== 0 && (
                   <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
                     Begin
@@ -203,29 +204,24 @@ export default function SelectVideoModal({
                     Skip Video
                   </Button>
                 )}
-                {viewingAreaController.video && (
-                  <ToggleLikeButton
-                    videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
-                    user={coveyTownController.userID}
-                  />
-                )}
                 <Button onClick={closeModal}>Cancel</Button>
               </ModalFooter>
             </form>
-            <Box
-              style={{
-                height: '400px',
-                overflowY: 'scroll',
-              }}>
-              <div
-                style={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}>
-                <ChatChannel interactableID={viewingAreaController.id} />
-              </div>
-            </Box>
+            <Heading as='h3' mt={4}>
+              <AccordionButton _expanded={{ bg: 'tomato', color: 'white' }}>
+                <Box flex='1' textAlign='left'>
+                  Queue
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </Heading>
+            <AccordionPanel>
+              <List aria-label='list of queue'>
+                {queue.map(videoName => {
+                  return <ListItem key={videoName}>{videoName}</ListItem>;
+                })}
+              </List>
+            </AccordionPanel>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
