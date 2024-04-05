@@ -101,7 +101,7 @@ export function ViewingAreaVideo({
     <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
         <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
-          <span>Viewing Area: {controller.id}</span>
+          <span>Watch your video here</span>
           <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
@@ -164,7 +164,7 @@ export function ViewingAreaVideo({
                       user={townController.userID}
                     />
                   )}
-                  {queue.length !== 0 && (
+                  {controller.video && (
                     <Button
                       colorScheme='yellow'
                       mr={3}

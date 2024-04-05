@@ -128,12 +128,10 @@ export default function SelectVideoModal({
   return (
     <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
-        <h2>
-          <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
-            <span>Pick a video to watch</span>
-            <AccordionIcon />
-          </AccordionButton>
-        </h2>
+        <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+          <span>Pick a video to watch</span>
+          <AccordionIcon />
+        </AccordionButton>
         <AccordionPanel pb={4}>
           <FormControl alignItems='center'>
             <FormLabel htmlFor='search'>Search for Videos</FormLabel>
@@ -149,19 +147,21 @@ export default function SelectVideoModal({
               </Button>
             </Flex>
           </FormControl>
-          {searchResults.length > 0 && (
-            <Select
-              variant='filled'
-              placeholder='Select this dropdown to see results'
-              onChange={event => handleSelectVideo(event.target.value)}
-              mt={2}>
-              {searchResults.map(item => (
-                <option key={item.id.videoId} value={item.id.videoId}>
-                  {item.snippet.title}
-                </option>
-              ))}
-            </Select>
-          )}
+          <Box>
+            {searchResults.length > 0 && (
+              <Select
+                variant='filled'
+                placeholder='Select this dropdown to see results'
+                onChange={event => handleSelectVideo(event.target.value)}
+                mt={2}>
+                {searchResults.map(item => (
+                  <option key={item.id.videoId} value={item.id.videoId}>
+                    {item.snippet.title}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Box>
           <FormControl mt={3}>
             <FormLabel htmlFor='video'>Here is your selected video: </FormLabel>
             <Flex>
@@ -185,7 +185,7 @@ export default function SelectVideoModal({
               ev.preventDefault();
               createViewingArea();
             }}>
-            <ModalFooter mt={4} justifyContent='center'>
+            <Box mt={4} textAlign='center'>
               {isBeginButtonVisible && queue.length !== 0 && (
                 <Button
                   colorScheme='whatsapp'
@@ -196,23 +196,29 @@ export default function SelectVideoModal({
                   Press here to start your Watch Party
                 </Button>
               )}
-            </ModalFooter>
+            </Box>
           </form>
-          <Heading as='h3' mt={4}>
-            <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
-              <Box flex='1' textAlign='left'>
-                Queue
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <UnorderedList aria-label='list of queue'>
-              {queue.map(videoName => {
-                return <ListItem key={videoName}>{videoName}</ListItem>;
-              })}
-            </UnorderedList>
-          </AccordionPanel>
+          <Box mt={4}>
+            <Accordion allowToggle defaultIndex={0}>
+              <AccordionItem>
+                <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+                  <Box flex='1' textAlign='left'>
+                    Queue
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4}>
+                  <Box>
+                    <UnorderedList aria-label='list of queue'>
+                      {queue.map(videoName => {
+                        return <ListItem key={videoName}>{videoName}</ListItem>;
+                      })}
+                    </UnorderedList>
+                  </Box>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </Box>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
