@@ -159,27 +159,31 @@ export function ViewingAreaVideo({
                     height='40vh' // Adjust height as needed
                   />
                 </Box>
-                <Box alignSelf='flex-end' mr={7} mt={2}>
-                  {controller.video && (
-                    <ToggleLikeButton
-                      videoID={controller.video.split('v=')[1].split('&')[0]}
-                      user={townController.userID}
-                    />
-                  )}
-                  {controller.video && (
-                    <Button
-                      colorScheme='yellow'
-                      mr={3}
-                      onClick={() => {
-                        controller.isPlaying = false;
-                        controller.video = queue.shift();
-                        setQueue([...queue]);
-                      }}>
-                      Skip Video
-                      <Icon as={IoPlaySkipForwardSharp} boxSize={6} mr={2} />
-                    </Button>
-                  )}
-                </Box>
+                <Flex alignSelf='flex-end' mr={7} mt={2}>
+                  <Box mr={1}>
+                    {controller.video && (
+                      <ToggleLikeButton
+                        videoID={controller.video.split('v=')[1].split('&')[0]}
+                        user={townController.userID}
+                      />
+                    )}
+                  </Box>
+                  <Box>
+                    {controller.video && (
+                      <Button
+                        colorScheme='purple'
+                        mr={3}
+                        onClick={() => {
+                          controller.isPlaying = false;
+                          controller.video = queue.shift();
+                          setQueue([...queue]);
+                        }}>
+                        Skip Video
+                        <Icon as={IoPlaySkipForwardSharp} boxSize={6} mr={2} />
+                      </Button>
+                    )}
+                  </Box>
+                </Flex>
               </Flex>
               <Box
                 height='400px'

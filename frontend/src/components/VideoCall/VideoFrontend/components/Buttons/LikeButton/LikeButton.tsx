@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Button from '@material-ui/core/Button';
 import HeartIcon from '../../../icons/HeartIcon';
 import FilledHeartIcon from '../../../icons/FilledHeartIcon'; // Adjust the import path
 import { addLikeToVideo, countLikes, doesUserLikeVideo, removeLikeFromVideo } from '../../../../../DB/FirebaseServices';
+import { Button, ChakraProvider } from '@chakra-ui/react';
+import customTheme from './LikeButtonTheme';
 
 export default function ToggleLikeButton(props: { videoID?: string, user?: string }) {
   const [isVideoLiked, setIsVideoLiked] = useState(false);
@@ -37,11 +38,15 @@ export default function ToggleLikeButton(props: { videoID?: string, user?: strin
   };
 
   return (
-    <Button
-      onClick={handleLikeToggle}
-      startIcon={isVideoLiked ? <FilledHeartIcon /> : <HeartIcon />}
-    >
-      Like {likeCount !== 0 ? `(${likeCount})` : ''} 
-    </Button>
+    <ChakraProvider theme={customTheme}>
+      <Button
+        onClick={handleLikeToggle}
+        leftIcon={isVideoLiked ? <FilledHeartIcon /> : <HeartIcon />}
+        colorScheme='customGray'
+        color='white'
+      >
+        Like {likeCount !== 0 ? `(${likeCount})` : ''} 
+      </Button>
+    </ChakraProvider>
   );
 }
