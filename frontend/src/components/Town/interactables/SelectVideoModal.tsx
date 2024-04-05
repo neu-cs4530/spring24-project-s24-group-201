@@ -9,10 +9,9 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Heading,
+  Icon,
   Input,
   ListItem,
-  ModalFooter,
   Select,
   UnorderedList,
   useToast,
@@ -22,6 +21,9 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ViewingArea from './ViewingArea';
+import { MdPlayCircleFilled } from 'react-icons/md';
+import { IoIosAddCircle } from 'react-icons/io';
+import { FaSearch } from 'react-icons/fa';
 
 type SearchResultItem = {
   id: { videoId: string };
@@ -143,6 +145,7 @@ export default function SelectVideoModal({
                 placeholder='Type to search YouTube videos'
               />
               <Button colorScheme='blue' onClick={handleSearch} ml={1}>
+                <Icon as={FaSearch} boxSize={6} mr={2} />
                 Search
               </Button>
             </Flex>
@@ -163,7 +166,7 @@ export default function SelectVideoModal({
             )}
           </Box>
           <FormControl mt={3}>
-            <FormLabel htmlFor='video'>Here is your selected video: </FormLabel>
+            <FormLabel htmlFor='video'>Here is your selected video:</FormLabel>
             <Flex>
               <Input
                 id='video'
@@ -176,6 +179,7 @@ export default function SelectVideoModal({
                 colorScheme='blue'
                 mr={3}
                 onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+                <Icon as={IoIosAddCircle} boxSize={6} mr={2} />
                 Add to queue
               </Button>
             </Flex>
@@ -188,12 +192,13 @@ export default function SelectVideoModal({
             <Box mt={4} textAlign='center'>
               {isBeginButtonVisible && queue.length !== 0 && (
                 <Button
-                  colorScheme='whatsapp'
+                  colorScheme='green'
                   mr={3}
                   onClick={createViewingArea}
                   fontWeight='bold'
-                  color='black'>
-                  Press here to start your Watch Party
+                  color='white'>
+                  <Icon as={MdPlayCircleFilled} boxSize={6} mr={2} style={{ color: 'white' }} />
+                  Start Watch Party
                 </Button>
               )}
             </Box>

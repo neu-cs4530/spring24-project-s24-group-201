@@ -15,6 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Icon,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -25,6 +26,7 @@ import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
 import ChatChannel from './ChatChannel';
 import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
+import { IoPlaySkipForwardSharp } from 'react-icons/io5';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -174,6 +176,7 @@ export function ViewingAreaVideo({
                         setQueue([...queue]);
                       }}>
                       Skip Video
+                      <Icon as={IoPlaySkipForwardSharp} boxSize={6} mr={2} />
                     </Button>
                   )}
                 </Box>
