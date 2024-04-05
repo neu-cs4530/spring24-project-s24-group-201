@@ -21,7 +21,7 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ViewingArea from './ViewingArea';
-import { MdPlayCircleFilled } from 'react-icons/md';
+import { MdPlayCircleFilled, MdMenu } from 'react-icons/md';
 import { IoIosAddCircle } from 'react-icons/io';
 import { FaSearch } from 'react-icons/fa';
 
@@ -184,30 +184,33 @@ export default function SelectVideoModal({
               </Button>
             </Flex>
           </FormControl>
-          <form
-            onSubmit={ev => {
-              ev.preventDefault();
-              createViewingArea();
-            }}>
-            <Box mt={4} textAlign='center'>
-              {isBeginButtonVisible && queue.length !== 0 && (
-                <Button
-                  colorScheme='green'
-                  mr={3}
-                  onClick={createViewingArea}
-                  fontWeight='bold'
-                  color='white'>
-                  <Icon as={MdPlayCircleFilled} boxSize={6} mr={2} style={{ color: 'white' }} />
-                  Start Watch Party
-                </Button>
-              )}
-            </Box>
-          </form>
+          <Box mt={4}>
+            <form
+              onSubmit={ev => {
+                ev.preventDefault();
+                createViewingArea();
+              }}>
+              <Box mt={4} textAlign='center'>
+                {isBeginButtonVisible && queue.length !== 0 && (
+                  <Button
+                    colorScheme='green'
+                    mr={3}
+                    onClick={createViewingArea}
+                    fontWeight='bold'
+                    color='white'>
+                    <Icon as={MdPlayCircleFilled} boxSize={6} mr={2} style={{ color: 'white' }} />
+                    Start Watch Party
+                  </Button>
+                )}
+              </Box>
+            </form>
+          </Box>
           <Box mt={4}>
             <Accordion allowToggle defaultIndex={0}>
               <AccordionItem>
                 <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
-                  <Box flex='1' textAlign='left'>
+                  <Box flex='1' alignItems='center' display='flex' textAlign='left'>
+                    <Icon as={MdMenu} boxSize={4} mr={2} alignSelf='center' />
                     Queue
                   </Box>
                   <AccordionIcon />
