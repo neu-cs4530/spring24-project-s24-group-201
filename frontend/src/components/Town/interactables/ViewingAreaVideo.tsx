@@ -8,6 +8,10 @@ import {
   Container,
   Flex,
   Heading,
+  List,
+  ListItem,
+  toast,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -17,16 +21,13 @@ import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
 import ChatChannel from './ChatChannel';
+import { canJoinWatchParty } from '../../DB/FirebaseServices' 
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
   render(): React.ReactNode {
     return <></>;
   }
-}
-
-interface ProgressState {
-  playedSeconds: number;
 }
 
 /**
@@ -50,18 +51,30 @@ interface ProgressState {
  */
 export function ViewingAreaVideo({
   controller,
+  watchPartyID,
 }: {
   controller: ViewingAreaController;
+  watchPartyID: string;
 }): JSX.Element {
   const [isPlaying, setPlaying] = useState<boolean>(controller.isPlaying);
   const [videoURL, setVideoURL] = useState<string>(controller.video || '');
+  const [queue, setQueue] = useState<string[]>(controller.queue || []);
   const townController = useTownController();
   const reactPlayerRef = useRef<ReactPlayer>(null);
-
-  // Sync state with the controller video property
-  useEffect(() => {
-    return setVideoURL(controller.video || '');
-  }, [controller.video]);
+  const toast = useToast(); // Make sure to call this hook
+  const checkCanJoinAndPlay = async () => {
+    const allowed = await canJoinWatchParty(townController.userID, watchPartyID); // watchPartyID will have to be passed as a prop or obtained from a context/store
+    if (!allowed) {
+      toast({
+        title: "Can't Join Watch Party",
+        description: "You are not on the host's friend list.",
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+      setPlaying(false);
+    }
+  };
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
@@ -80,6 +93,29 @@ export function ViewingAreaVideo({
     };
   }, [controller]);
 
+  useEffect(() => {
+    const queueUpdater = (updatedQueue: string[]) => {
+      setQueue(updatedQueue);
+    };
+    const videoChangeQueueUpdater = (updatedVideo: string | undefined) => {
+      if (updatedVideo) {
+        setVideoURL(updatedVideo);
+      }
+    };
+    controller.addListener('queueChange', queueUpdater);
+    controller.addListener('videoChange', videoChangeQueueUpdater);
+    return () => {
+      controller.removeListener('queueChange', queueUpdater);
+      controller.removeListener('videoChange', videoChangeQueueUpdater);
+    };
+  }, [controller]);
+
+  useEffect(() => {
+    if (watchPartyID) {
+      checkCanJoinAndPlay();
+    }
+  }, [watchPartyID]); 
+
   return (
     <Container className='participant-wrapper'>
       Viewing Area: {controller.id}
@@ -88,15 +124,20 @@ export function ViewingAreaVideo({
           <Heading as='h3'>
             <AccordionButton>
               <Box flex='1' textAlign='left'>
-                Leaderboard
+                Queue
               </Box>
               <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel>{/* <Statistics /> */}</AccordionPanel>
           </Heading>
+          <AccordionPanel>
+            <List aria-label='list of queue'>
+              {queue.map(video => {
+                return <ListItem key={video}>{video}</ListItem>;
+              })}
+            </List>
+          </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      {controller.queue}
       <Flex direction='column'>
         <Box>
           <ReactPlayer
@@ -132,8 +173,9 @@ export function ViewingAreaVideo({
             onEnded={() => {
               if (controller.isPlaying) {
                 controller.isPlaying = false;
-                if (controller.queue.length > 0) {
-                  controller.video = controller.queue.shift();
+                if (queue.length > 0) {
+                  controller.video = queue.shift();
+                  setQueue([...queue]);
                 }
                 townController.emitViewingAreaUpdate(controller);
               }
@@ -177,14 +219,12 @@ export function ViewingArea({
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
     viewingArea.name,
   );
+  const [watchPartyID, setWatchPartyID] = useState<string>('');
   const [selectIsOpen, setSelectIsOpen] = useState(viewingAreaController.video === undefined);
-  const [viewingAreaVideoURL, setViewingAreaVideoURL] = useState(viewingAreaController.video);
   useEffect(() => {
     const setURL = (url: string | undefined) => {
       if (!url) {
         townController.interactableEmitter.emit('endIteraction', viewingAreaController);
-      } else {
-        setViewingAreaVideoURL(url);
       }
     };
     viewingAreaController.addListener('videoChange', setURL);
@@ -193,21 +233,6 @@ export function ViewingArea({
     };
   }, [viewingAreaController, townController]);
 
-  if (!viewingAreaVideoURL) {
-    return (
-      <SelectVideoModal
-        isOpen={selectIsOpen}
-        close={() => {
-          setSelectIsOpen(false);
-          // forces game to emit "viewingArea" event again so that
-          // repoening the modal works as expected
-          townController.interactEnd(viewingArea);
-        }}
-        viewingArea={viewingArea}
-        viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
-      />
-    );
-  }
   return (
     <SelectVideoModal
       isOpen={selectIsOpen}
@@ -218,7 +243,7 @@ export function ViewingArea({
         townController.interactEnd(viewingArea);
       }}
       viewingArea={viewingArea}
-      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
+      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} watchPartyID={watchPartyID} />}
     />
   );
 }

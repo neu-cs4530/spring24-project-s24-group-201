@@ -14,6 +14,9 @@ import {
 } from 'firebase/firestore';
 
 import { initializeApp } from 'firebase/app';
+import { nanoid } from 'nanoid';
+
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -43,6 +46,11 @@ export interface LikeData {
 export interface FriendData {
   friendID: string;
   friendSince: Date;
+}
+
+export interface WatchParty {
+  hostID: string;
+  friendsList: string[]; // List of friends' IDs who are allowed to join
 }
 
 /**
@@ -165,3 +173,34 @@ export async function areUsersFriends(userID: string, friendID: string): Promise
   const docSnap = await getDoc(friendRef);
   return docSnap.exists();
 }
+
+export async function createWatchParty(hostID: string, watchPartyID: string): Promise<void> {
+  const friendsRef = collection(db, 'users', hostID, 'friends');
+  const friendsSnap = await getDocs(friendsRef);
+  const friendsList = friendsSnap.docs.map(doc => doc.id);
+
+  const watchPartyRef = doc(db, 'watchParties', watchPartyID);
+  await setDoc(watchPartyRef, {
+    hostID: hostID,
+    friendsList: friendsList,
+  });
+}
+
+
+export async function canJoinWatchParty(userID: string, watchPartyID: string): Promise<boolean> {
+  const watchPartyRef = doc(db, 'watchParties', watchPartyID);
+  const watchPartySnap = await getDoc(watchPartyRef);
+
+  if (watchPartySnap.exists()) {
+    const watchParty = watchPartySnap.data() as WatchParty;
+    return watchParty.hostID === userID || watchParty.friendsList.includes(userID);
+  }
+  return false;
+}
+
+
+export async function generateUniqueWatchPartyID(): Promise<string> {
+  return nanoid();
+}
+
+

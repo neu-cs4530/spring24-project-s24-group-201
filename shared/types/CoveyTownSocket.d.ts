@@ -73,6 +73,7 @@ export interface ViewingArea extends Interactable {
   isPlaying: boolean;
   elapsedTimeSec: number;
   queue: string[];
+  hostID?: string;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';

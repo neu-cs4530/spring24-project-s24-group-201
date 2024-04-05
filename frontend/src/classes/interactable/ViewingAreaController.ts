@@ -46,6 +46,9 @@ export default class ViewingAreaController extends InteractableAreaController<
 > {
   private _model: ViewingAreaModel;
 
+  private _hostID?: string;
+
+
   /**
    * Constructs a new ViewingAreaController, initialized with the state of the
    * provided viewingAreaModel.
@@ -55,6 +58,7 @@ export default class ViewingAreaController extends InteractableAreaController<
   constructor(viewingAreaModel: ViewingAreaModel) {
     super(viewingAreaModel.id);
     this._model = viewingAreaModel;
+    this._hostID = viewingAreaModel.hostID;
   }
 
   public isActive(): boolean {
@@ -68,6 +72,15 @@ export default class ViewingAreaController extends InteractableAreaController<
     return this._model.video;
   }
 
+  public get hostID(): string | undefined {
+    return this._model.hostID;
+  }
+
+  public set hostID(value: string | undefined) {
+    if (this._model.hostID !== value) {
+      this._model.hostID = value;
+    }
+  }
   /**
    * The URL of the video assigned to this viewing area, or undefined if there is not one.
    *

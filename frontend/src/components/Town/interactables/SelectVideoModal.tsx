@@ -20,6 +20,9 @@ import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
 import ViewingArea from './ViewingArea';
+import { createWatchParty } from '../../DB/FirebaseServices'; // adjust the path accordingly
+import { generateUniqueWatchPartyID } from '../../DB/FirebaseServices';
+
 
 type SearchResultItem = {
   id: { videoId: string };
@@ -42,12 +45,15 @@ export default function SelectVideoModal({
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
     viewingArea?.name,
   );
+  const isHost = coveyTownController.userID === viewingAreaController.hostID;
 
   const [video, setVideo] = useState<string>(viewingArea?.defaultVideoURL || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
   const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
+  const [watchPartyID, setWatchPartyID] = useState<string>('');
+
 
   useEffect(() => {
     if (isOpen) {
@@ -93,11 +99,20 @@ export default function SelectVideoModal({
     setSearchResults([]); // Clear search results after selection
   };
 
+  const handleCreateWatchParty = async () => {
+    const newWatchPartyID = await generateUniqueWatchPartyID(); // Implement this function in FirebaseServices.ts
+    setWatchPartyID(newWatchPartyID);
+    await createWatchParty(coveyTownController.userID, newWatchPartyID);
+  };
+
   const createViewingArea = useCallback(async () => {
     setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
+      if(isHost){
+        await handleCreateWatchParty(); // Call this function if the user is a host
+      }
       const request = {
         id: viewingAreaController.id,
         video: videoToPlay,
@@ -129,7 +144,7 @@ export default function SelectVideoModal({
         }
       }
     }
-  }, [video, viewingAreaController, queue, coveyTownController, toast]);
+  }, [video, viewingAreaController, queue, coveyTownController, toast, isHost]);
 
   return (
     <Modal isOpen={isOpen} onClose={closeModal}>
@@ -171,7 +186,6 @@ export default function SelectVideoModal({
             createViewingArea();
           }}>
           <ModalFooter>
-            {queue}
             {isBeginButtonVisible && queue.length !== 0 && (
               <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
                 Begin
@@ -187,7 +201,11 @@ export default function SelectVideoModal({
               <Button
                 colorScheme='yellow'
                 mr={3}
-                onClick={() => (viewingAreaController.video = queue.shift())}>
+                onClick={() => {
+                  viewingAreaController.isPlaying = false;
+                  viewingAreaController.video = queue.shift();
+                  setQueue([...queue]);
+                }}>
                 Skip Video
               </Button>
             )}
