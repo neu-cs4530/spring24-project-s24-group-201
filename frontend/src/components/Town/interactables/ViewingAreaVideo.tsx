@@ -159,28 +159,27 @@ export function ViewingAreaVideo({
                     height='40vh' // Adjust height as needed
                   />
                 </Box>
-                <Flex alignSelf='flex-end' mr={7} mt={2}>
-                  <Box mr={1}>
-                    {controller.video && (
-                      <ToggleLikeButton
-                        videoID={controller.video.split('v=')[1].split('&')[0]}
-                        user={townController.userID}
-                      />
-                    )}
-                  </Box>
+                <Flex alignSelf='flex-end' mr={10} mt={2}>
                   <Box>
-                    {controller.video && (
+                    {controller.video && controller.queue.length !== 0 && (
                       <Button
                         colorScheme='purple'
-                        mr={3}
                         onClick={() => {
                           controller.isPlaying = false;
                           controller.video = queue.shift();
                           setQueue([...queue]);
                         }}>
                         Skip Video
-                        <Icon as={IoPlaySkipForwardSharp} boxSize={6} mr={2} />
+                        <Icon as={IoPlaySkipForwardSharp} boxSize={6} ml={1} />
                       </Button>
+                    )}
+                  </Box>
+                  <Box ml={1}>
+                    {controller.video && (
+                      <ToggleLikeButton
+                        videoID={controller.video.split('v=')[1].split('&')[0]}
+                        user={townController.userID}
+                      />
                     )}
                   </Box>
                 </Flex>
