@@ -263,7 +263,6 @@ export function ViewingArea({
             <SelectVideoModal isOpen={selectIsOpen} viewingArea={viewingArea} />
             <ViewingAreaVideo controller={viewingAreaController}></ViewingAreaVideo>
           </ModalBody>
-          <ModalFooter>{/* Add any footer buttons or actions here */}</ModalFooter>
         </ModalContent>
       </Modal>
     </Flex>
