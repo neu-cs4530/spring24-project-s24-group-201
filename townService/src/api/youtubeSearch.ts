@@ -49,4 +49,46 @@ router.get('/youtube-search', async (req, res) => {
   }
 });
 
+router.get('/youtube-video-info', async (req, res) => {
+  const videoUrl = req.query.url as string;
+  if (!videoUrl) {
+    return res.status(400).send('URL parameter is required.');
+  }
+
+  // Extract the video ID from the URL
+  let videoId = '';
+  const urlParams = new URLSearchParams(new URL(videoUrl).search);
+  const videoIdParam = urlParams.get('v');
+  if (!videoIdParam) {
+    return res.status(400).send('Invalid YouTube URL.');
+  }
+  videoId = videoIdParam;
+
+  if (!videoId) {
+    return res.status(400).send('Invalid YouTube URL.');
+  }
+
+  const apiKey = process.env.REACT_APP_YOUTUBE_API_KEY;
+  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${apiKey}`;
+
+  try {
+    const youtubeResponse = await fetch(url);
+    if (!youtubeResponse.ok) {
+      throw new Error('YouTube API returned an error.');
+    }
+
+    const youtubeData = (await youtubeResponse.json()) as YouTubeApiResponse;
+
+    if (youtubeData.items) {
+      if (youtubeData.items.length !== 0) {
+        return res.status(200).json({ title: youtubeData.items[0].snippet.title });
+      }
+      return res.status(404).send('Video not found.');
+    }
+    return res.status(404).send('Video not found.');
+  } catch (error) {
+    return res.status(500).send('Internal Server Error');
+  }
+});
+
 export default router;
