@@ -55,7 +55,7 @@ export default function SelectVideoModal({
     } else {
       coveyTownController.unPause();
     }
-  }, [coveyTownController, isOpen, viewingAreaController, queue]);
+  }, [coveyTownController, isOpen, viewingAreaController, viewingAreaController.video, queue]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
@@ -127,6 +127,7 @@ export default function SelectVideoModal({
         }
       }
     }
+    coveyTownController.emitViewingAreaUpdate(viewingAreaController);
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
@@ -200,7 +201,7 @@ export default function SelectVideoModal({
           )}
           <Button onClick={closeModal}>Cancel</Button>
         </ModalFooter>
-        {viewingAreaController.video && viewingVideo}
+        {viewingVideo}
       </ModalContent>
     </Modal>
   );
