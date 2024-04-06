@@ -47,7 +47,6 @@ export default function SelectVideoModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
-  const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +93,6 @@ export default function SelectVideoModal({
   };
 
   const createViewingArea = useCallback(async () => {
-    setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
@@ -141,7 +139,7 @@ export default function SelectVideoModal({
           <FormControl mt={4}>
             <FormLabel htmlFor='search'>Search for Videos</FormLabel>
             <Input
-              id='search'
+              name='search'
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder='Type to search YouTube videos'
@@ -164,46 +162,45 @@ export default function SelectVideoModal({
             <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
             <Input id='video' name='video' value={video} onChange={e => setVideo(e.target.value)} />
           </FormControl>
+          <form
+            onSubmit={ev => {
+              ev.preventDefault();
+              createViewingArea();
+            }}></form>
         </ModalBody>
-        <form
-          onSubmit={ev => {
-            ev.preventDefault();
-            createViewingArea();
-          }}>
-          <ModalFooter>
-            {isBeginButtonVisible && queue.length !== 0 && (
-              <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-                Begin
-              </Button>
-            )}
-            <Button
-              colorScheme='green'
-              mr={3}
-              onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
-              Add to queue
+        <ModalFooter>
+          {!viewingAreaController.video && queue.length !== 0 && (
+            <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
+              Begin
             </Button>
-            {queue.length !== 0 && (
-              <Button
-                colorScheme='yellow'
-                mr={3}
-                onClick={() => {
-                  viewingAreaController.isPlaying = false;
-                  viewingAreaController.video = queue.shift();
-                  setQueue([...queue]);
-                }}>
-                Skip Video
-              </Button>
-            )}
-            {viewingAreaController.video && (
-              <ToggleLikeButton
-                videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
-                user={coveyTownController.userID}
-              />
-            )}
-            <Button onClick={closeModal}>Cancel</Button>
-          </ModalFooter>
-        </form>
-        {viewingVideo}
+          )}
+          <Button
+            colorScheme='green'
+            mr={3}
+            onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+            Add to queue
+          </Button>
+          {queue.length !== 0 && (
+            <Button
+              colorScheme='yellow'
+              mr={3}
+              onClick={() => {
+                viewingAreaController.isPlaying = false;
+                viewingAreaController.video = queue.shift();
+                setQueue([...queue]);
+              }}>
+              Skip Video
+            </Button>
+          )}
+          {viewingAreaController.video && (
+            <ToggleLikeButton
+              videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
+              user={coveyTownController.userID}
+            />
+          )}
+          <Button onClick={closeModal}>Cancel</Button>
+        </ModalFooter>
+        {viewingAreaController.video && viewingVideo}
       </ModalContent>
     </Modal>
   );

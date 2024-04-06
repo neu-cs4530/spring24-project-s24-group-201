@@ -113,68 +113,67 @@ export function ViewingAreaVideo({
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <Flex direction='column'>
-        <Box>
-          <ReactPlayer
-            url={videoURL}
-            ref={reactPlayerRef}
-            config={{
-              youtube: {
-                playerVars: {
-                  disablekb: 1,
-                  autoplay: 1,
-                },
+      {queue}
+      <Box>
+        <ReactPlayer
+          url={videoURL}
+          ref={reactPlayerRef}
+          config={{
+            youtube: {
+              playerVars: {
+                disablekb: 1,
+                autoplay: 1,
               },
-            }}
-            playing={isPlaying}
-            onProgress={state => {
-              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-                controller.elapsedTimeSec = state.playedSeconds;
-                townController.emitViewingAreaUpdate(controller);
+            },
+          }}
+          playing={isPlaying}
+          onProgress={state => {
+            if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
+              controller.elapsedTimeSec = state.playedSeconds;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onPlay={() => {
+            if (!controller.isPlaying) {
+              controller.isPlaying = true;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onPause={() => {
+            if (controller.isPlaying) {
+              controller.isPlaying = false;
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          onEnded={() => {
+            if (controller.isPlaying) {
+              controller.isPlaying = false;
+              if (queue.length > 0) {
+                controller.video = queue.shift();
+                setQueue([...queue]);
               }
-            }}
-            onPlay={() => {
-              if (!controller.isPlaying) {
-                controller.isPlaying = true;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPause={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onEnded={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                if (queue.length > 0) {
-                  controller.video = queue.shift();
-                  setQueue([...queue]);
-                }
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            controls={true}
-            width='100%'
-            height='100%'
-          />
-        </Box>
-        <Box
+              townController.emitViewingAreaUpdate(controller);
+            }
+          }}
+          controls={true}
+          width='100%'
+          height='100%'
+        />
+      </Box>
+      <Box
+        style={{
+          height: '400px',
+          overflowY: 'scroll',
+        }}>
+        <div
           style={{
-            height: '400px',
-            overflowY: 'scroll',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
           }}>
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <ChatChannel interactableID={controller.id} />
-          </div>
-        </Box>
-      </Flex>
+          <ChatChannel interactableID={controller.id} />
+        </div>
+      </Box>
     </Container>
   );
 }
