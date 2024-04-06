@@ -16,6 +16,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Icon,
+  Image,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -111,53 +112,63 @@ export function ViewingAreaVideo({
             <Flex>
               <Flex direction='column'>
                 <Box mr={10}>
-                  <ReactPlayer
-                    url={videoURL}
-                    ref={reactPlayerRef}
-                    config={{
-                      youtube: {
-                        playerVars: {
-                          disablekb: 1,
-                          autoplay: 1,
+                  {!controller.video && (
+                    <Image
+                      src='https://via.placeholder.com/600x400.png?text=Select+video+to+be+played+here'
+                      alt='Your video will be played here'
+                      width='100%'
+                      height='100%'
+                    />
+                  )}
+                  {controller.video && (
+                    <ReactPlayer
+                      url={videoURL}
+                      ref={reactPlayerRef}
+                      config={{
+                        youtube: {
+                          playerVars: {
+                            disablekb: 1,
+                            autoplay: 1,
+                          },
                         },
-                      },
-                    }}
-                    playing={isPlaying}
-                    onProgress={state => {
-                      if (
-                        state.playedSeconds != 0 &&
-                        state.playedSeconds != controller.elapsedTimeSec
-                      ) {
-                        controller.elapsedTimeSec = state.playedSeconds;
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    onPlay={() => {
-                      if (!controller.isPlaying) {
-                        controller.isPlaying = true;
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    onPause={() => {
-                      if (controller.isPlaying) {
-                        controller.isPlaying = false;
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    onEnded={() => {
-                      if (controller.isPlaying) {
-                        controller.isPlaying = false;
-                        if (queue.length > 0) {
-                          controller.video = queue.shift();
-                          setQueue([...queue]);
+                      }}
+                      playing={isPlaying}
+                      onProgress={state => {
+                        if (
+                          state.playedSeconds != 0 &&
+                          state.playedSeconds != controller.elapsedTimeSec
+                        ) {
+                          controller.elapsedTimeSec = state.playedSeconds;
+                          townController.emitViewingAreaUpdate(controller);
                         }
-                        townController.emitViewingAreaUpdate(controller);
-                      }
-                    }}
-                    controls={true}
-                    width='50vw' // Adjust width as needed
-                    height='40vh' // Adjust height as needed
-                  />
+                      }}
+                      onPlay={() => {
+                        if (!controller.isPlaying) {
+                          controller.isPlaying = true;
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      onPause={() => {
+                        if (controller.isPlaying) {
+                          controller.isPlaying = false;
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      onEnded={() => {
+                        if (controller.isPlaying) {
+                          controller.isPlaying = false;
+                          if (queue.length > 0) {
+                            controller.video = queue.shift();
+                            setQueue([...queue]);
+                          }
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      controls={true}
+                      width='50vw' // Adjust width as needed
+                      height='40vh' // Adjust height as needed
+                    />
+                  )}
                 </Box>
                 <Flex alignSelf='flex-end' mr={10} mt={2}>
                   <Box>
