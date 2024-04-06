@@ -55,7 +55,7 @@ export default function SelectVideoModal({
     } else {
       coveyTownController.unPause();
     }
-  }, [coveyTownController, isOpen, viewingAreaController, viewingAreaController.video, queue]);
+  }, [coveyTownController, isOpen, viewingAreaController, queue]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
@@ -127,7 +127,6 @@ export default function SelectVideoModal({
         }
       }
     }
-    coveyTownController.emitViewingAreaUpdate(viewingAreaController);
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
