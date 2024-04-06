@@ -36,7 +36,6 @@ export default function SelectVideoModal({
   viewingArea,
 }: {
   isOpen: boolean;
-  close: () => void;
   viewingArea: ViewingArea;
 }): JSX.Element {
   const coveyTownController = useTownController();

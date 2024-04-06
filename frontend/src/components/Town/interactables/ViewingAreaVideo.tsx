@@ -260,16 +260,7 @@ export function ViewingArea({
 
           <ModalCloseButton />
           <ModalBody>
-            <SelectVideoModal
-              isOpen={selectIsOpen}
-              close={() => {
-                setSelectIsOpen(false);
-                // forces game to emit "viewingArea" event again so that
-                // reopening the modal works as expected
-                townController.interactEnd(viewingArea);
-              }}
-              viewingArea={viewingArea}
-            />
+            <SelectVideoModal isOpen={selectIsOpen} viewingArea={viewingArea} />
             <ViewingAreaVideo controller={viewingAreaController}></ViewingAreaVideo>
           </ModalBody>
           <ModalFooter>{/* Add any footer buttons or actions here */}</ModalFooter>
