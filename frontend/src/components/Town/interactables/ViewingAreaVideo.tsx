@@ -185,7 +185,7 @@ export function ViewingAreaVideo({
                     )}
                   </Box>
                   <Box ml={1}>
-                    {controller.video && (
+                    {controller.video && controller.video.includes('v=') && (
                       <ToggleLikeButton
                         videoID={controller.video.split('v=')[1].split('&')[0]}
                         user={townController.userID}
