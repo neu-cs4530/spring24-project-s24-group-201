@@ -5,11 +5,17 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Container,
+  Button,
+  Center,
   Flex,
-  Heading,
-  List,
-  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Icon,
+  Image,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -19,6 +25,8 @@ import useTownController from '../../../hooks/useTownController';
 import SelectVideoModal from './SelectVideoModal';
 import ViewingAreaInteractable from './ViewingArea';
 import ChatChannel from './ChatChannel';
+import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
+import { IoPlaySkipForwardSharp } from 'react-icons/io5';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -92,90 +100,115 @@ export function ViewingAreaVideo({
   }, [controller]);
 
   return (
-    <Container className='participant-wrapper'>
-      Viewing Area: {controller.id}
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Queue
+    <Accordion allowToggle defaultIndex={0}>
+      <AccordionItem>
+        <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+          <span>Watch your video here</span>
+          <AccordionIcon />
+        </AccordionButton>
+        <AccordionPanel>
+          <Center>
+            <Flex>
+              <Flex direction='column'>
+                <Box mr={10}>
+                  {!controller.video && (
+                    <Image
+                      src='https://via.placeholder.com/600x400.png?text=Select+video+to+be+played+here'
+                      alt='Your video will be played here'
+                      width='100%'
+                      height='100%'
+                    />
+                  )}
+                  {controller.video && (
+                    <ReactPlayer
+                      url={videoURL}
+                      ref={reactPlayerRef}
+                      config={{
+                        youtube: {
+                          playerVars: {
+                            disablekb: 1,
+                            autoplay: 1,
+                          },
+                        },
+                      }}
+                      playing={isPlaying}
+                      onProgress={state => {
+                        if (
+                          state.playedSeconds != 0 &&
+                          state.playedSeconds != controller.elapsedTimeSec
+                        ) {
+                          controller.elapsedTimeSec = state.playedSeconds;
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      onPlay={() => {
+                        if (!controller.isPlaying) {
+                          controller.isPlaying = true;
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      onPause={() => {
+                        if (controller.isPlaying) {
+                          controller.isPlaying = false;
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      onEnded={() => {
+                        if (controller.isPlaying) {
+                          controller.isPlaying = false;
+                          if (queue.length > 0) {
+                            controller.video = queue.shift();
+                            setQueue([...queue]);
+                          }
+                          townController.emitViewingAreaUpdate(controller);
+                        }
+                      }}
+                      controls={true}
+                      width='37vw' // Adjust width as needed
+                      height='30vh' // Adjust height as needed
+                    />
+                  )}
+                </Box>
+                <Flex alignSelf='flex-end' mr={10} mt={2}>
+                  <Box>
+                    {controller.video && controller.queue.length !== 0 && (
+                      <Button
+                        colorScheme='purple'
+                        onClick={() => {
+                          controller.isPlaying = false;
+                          controller.video = queue.shift();
+                          setQueue([...queue]);
+                        }}>
+                        Skip Video
+                        <Icon as={IoPlaySkipForwardSharp} boxSize={6} ml={1} />
+                      </Button>
+                    )}
+                  </Box>
+                  <Box ml={1}>
+                    {controller.video && controller.video.includes('v=') && (
+                      <ToggleLikeButton
+                        videoID={controller.video.split('v=')[1].split('&')[0]}
+                        user={townController.userID}
+                      />
+                    )}
+                  </Box>
+                </Flex>
+              </Flex>
+              <Box
+                height='37vh'
+                width='20vw'
+                overflowY='scroll'
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                <ChatChannel interactableID={controller.id} />
               </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <List aria-label='list of queue'>
-              {queue.map(video => {
-                return <ListItem key={video}>{video}</ListItem>;
-              })}
-            </List>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-      <Flex direction='column'>
-        <Box>
-          <ReactPlayer
-            url={videoURL}
-            ref={reactPlayerRef}
-            config={{
-              youtube: {
-                playerVars: {
-                  disablekb: 1,
-                  autoplay: 1,
-                },
-              },
-            }}
-            playing={isPlaying}
-            onProgress={state => {
-              if (state.playedSeconds != 0 && state.playedSeconds != controller.elapsedTimeSec) {
-                controller.elapsedTimeSec = state.playedSeconds;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPlay={() => {
-              if (!controller.isPlaying) {
-                controller.isPlaying = true;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onPause={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            onEnded={() => {
-              if (controller.isPlaying) {
-                controller.isPlaying = false;
-                if (queue.length > 0) {
-                  controller.video = queue.shift();
-                  setQueue([...queue]);
-                }
-                townController.emitViewingAreaUpdate(controller);
-              }
-            }}
-            controls={true}
-            width='100%'
-            height='100%'
-          />
-        </Box>
-        <Box
-          style={{
-            height: '400px',
-            overflowY: 'scroll',
-          }}>
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <ChatChannel interactableID={controller.id} />
-          </div>
-        </Box>
-      </Flex>
-    </Container>
+            </Flex>
+          </Center>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
@@ -208,17 +241,30 @@ export function ViewingArea({
   }, [viewingAreaController, townController]);
 
   return (
-    <SelectVideoModal
-      isOpen={selectIsOpen}
-      close={() => {
-        setSelectIsOpen(false);
-        // forces game to emit "viewingArea" event again so that
-        // repoening the modal works as expected
-        townController.interactEnd(viewingArea);
-      }}
-      viewingArea={viewingArea}
-      viewingVideo={<ViewingAreaVideo controller={viewingAreaController} />}
-    />
+    <Flex>
+      <Modal
+        isOpen={selectIsOpen}
+        onClose={() => {
+          setSelectIsOpen(false);
+          // forces game to emit "viewingArea" event again so that
+          // reopening the modal works as expected
+          townController.interactEnd(viewingArea);
+        }}
+        size='6xl'>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader fontFamily='heading' color='black' bg='white'>
+            Welcome to the YouTube Watch Party
+          </ModalHeader>
+
+          <ModalCloseButton />
+          <ModalBody>
+            <SelectVideoModal isOpen={selectIsOpen} viewingArea={viewingArea} />
+            <ViewingAreaVideo controller={viewingAreaController}></ViewingAreaVideo>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </Flex>
   );
 }
 

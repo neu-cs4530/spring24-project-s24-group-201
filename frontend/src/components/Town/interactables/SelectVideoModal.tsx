@@ -1,25 +1,29 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
+  Icon,
   Input,
-  List,
   ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Select,
+  UnorderedList,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import ViewingAreaController from '../../../classes/interactable/ViewingAreaController';
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
 import ViewingArea from './ViewingArea';
+import { MdPlayCircleFilled, MdMenu } from 'react-icons/md';
+import { IoIosAddCircle } from 'react-icons/io';
+import { FaSearch } from 'react-icons/fa';
 
 type SearchResultItem = {
   id: { videoId: string };
@@ -29,14 +33,10 @@ type SearchResultItem = {
 
 export default function SelectVideoModal({
   isOpen,
-  close,
   viewingArea,
-  viewingVideo,
 }: {
   isOpen: boolean;
-  close: () => void;
   viewingArea: ViewingArea;
-  viewingVideo: JSX.Element;
 }): JSX.Element {
   const coveyTownController = useTownController();
   const viewingAreaController = useInteractableAreaController<ViewingAreaController>(
@@ -57,11 +57,6 @@ export default function SelectVideoModal({
       coveyTownController.unPause();
     }
   }, [coveyTownController, isOpen, viewingAreaController, queue]);
-
-  const closeModal = useCallback(() => {
-    coveyTownController.unPause();
-    close();
-  }, [coveyTownController, close]);
 
   const toast = useToast();
 
@@ -132,79 +127,107 @@ export default function SelectVideoModal({
   }, [video, viewingAreaController, queue, coveyTownController, toast]);
 
   return (
-    <Modal isOpen={isOpen} onClose={closeModal}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Pick a video to watch in {viewingAreaController?.id}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <FormControl mt={4}>
+    <Accordion allowToggle defaultIndex={0}>
+      <AccordionItem>
+        <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+          <span>Pick a video to watch</span>
+          <AccordionIcon />
+        </AccordionButton>
+        <AccordionPanel pb={4}>
+          <FormControl alignItems='center'>
             <FormLabel htmlFor='search'>Search for Videos</FormLabel>
-            <Input
-              id='search'
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder='Type to search YouTube videos'
-            />
-            <Button mt={2} colorScheme='blue' onClick={handleSearch}>
-              Search
-            </Button>
-            <List spacing={3}>
-              {searchResults.map(item => (
-                <ListItem
-                  key={item.id.videoId}
-                  cursor='pointer'
-                  onClick={() => handleSelectVideo(item.id.videoId)}>
-                  {item.snippet.title}
-                </ListItem>
-              ))}
-            </List>
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor='video'>Or enter Video URL</FormLabel>
-            <Input id='video' name='video' value={video} onChange={e => setVideo(e.target.value)} />
-          </FormControl>
-        </ModalBody>
-        <form
-          onSubmit={ev => {
-            ev.preventDefault();
-            createViewingArea();
-          }}>
-          <ModalFooter>
-            {isBeginButtonVisible && queue.length !== 0 && (
-              <Button colorScheme='blue' mr={3} onClick={createViewingArea}>
-                Begin
-              </Button>
-            )}
-            <Button
-              colorScheme='green'
-              mr={3}
-              onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
-              Add to queue
-            </Button>
-            {queue.length !== 0 && (
-              <Button
-                colorScheme='yellow'
-                mr={3}
-                onClick={() => {
-                  viewingAreaController.isPlaying = false;
-                  viewingAreaController.video = queue.shift();
-                  setQueue([...queue]);
-                }}>
-                Skip Video
-              </Button>
-            )}
-            {viewingAreaController.video && (
-              <ToggleLikeButton
-                videoID={viewingAreaController.video.split('v=')[1].split('&')[0]}
-                user={coveyTownController.userID}
+            <Flex>
+              <Input
+                id='search'
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder='Type to search YouTube videos'
               />
+              <Button colorScheme='blue' onClick={handleSearch} ml={1}>
+                <Icon as={FaSearch} boxSize={6} mr={2} />
+                Search
+              </Button>
+            </Flex>
+          </FormControl>
+          <Box>
+            {searchResults.length > 0 && (
+              <Select
+                variant='filled'
+                placeholder='Select this dropdown to see results'
+                onChange={event => handleSelectVideo(event.target.value)}
+                mt={2}>
+                {searchResults.map(item => (
+                  <option key={item.id.videoId} value={item.id.videoId}>
+                    {item.snippet.title}
+                  </option>
+                ))}
+              </Select>
             )}
-            <Button onClick={closeModal}>Cancel</Button>
-          </ModalFooter>
-        </form>
-        {viewingVideo}
-      </ModalContent>
-    </Modal>
+          </Box>
+          <FormControl mt={3}>
+            <FormLabel htmlFor='video'>Here is your selected video:</FormLabel>
+            <Flex>
+              <Input
+                id='video'
+                name='video'
+                value={video}
+                onChange={e => setVideo(e.target.value)}
+              />
+              <Button
+                ml={1}
+                colorScheme='blue'
+                mr={3}
+                onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+                <Icon as={IoIosAddCircle} boxSize={6} mr={2} />
+                Add to queue
+              </Button>
+            </Flex>
+          </FormControl>
+          <Box mt={4}>
+            <form
+              onSubmit={ev => {
+                ev.preventDefault();
+                createViewingArea();
+              }}>
+              <Box mt={4} textAlign='center'>
+                {isBeginButtonVisible && queue.length !== 0 && (
+                  <Button
+                    colorScheme='green'
+                    mr={3}
+                    onClick={createViewingArea}
+                    fontWeight='bold'
+                    color='white'>
+                    <Icon as={MdPlayCircleFilled} boxSize={6} mr={2} style={{ color: 'white' }} />
+                    Start Watch Party
+                  </Button>
+                )}
+              </Box>
+            </form>
+          </Box>
+          <Box mt={4}>
+            <Accordion allowToggle defaultIndex={0}>
+              <AccordionItem>
+                <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+                  <Box flex='1' alignItems='center' display='flex' textAlign='left'>
+                    <Icon as={MdMenu} boxSize={4} mr={2} alignSelf='center' />
+                    Queue
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4}>
+                  <Box>
+                    <UnorderedList aria-label='list of queue'>
+                      {queue.map(videoName => {
+                        return <ListItem key={videoName}>{videoName}</ListItem>;
+                      })}
+                    </UnorderedList>
+                  </Box>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </Box>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
