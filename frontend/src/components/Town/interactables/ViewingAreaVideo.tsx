@@ -12,7 +12,6 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   Icon,
@@ -165,8 +164,8 @@ export function ViewingAreaVideo({
                         }
                       }}
                       controls={true}
-                      width='50vw' // Adjust width as needed
-                      height='40vh' // Adjust height as needed
+                      width='37vw' // Adjust width as needed
+                      height='30vh' // Adjust height as needed
                     />
                   )}
                 </Box>
@@ -196,8 +195,8 @@ export function ViewingAreaVideo({
                 </Flex>
               </Flex>
               <Box
-                height='400px'
-                width='600px'
+                height='37vh'
+                width='20vw'
                 overflowY='scroll'
                 style={{
                   display: 'flex',
@@ -251,7 +250,7 @@ export function ViewingArea({
           // reopening the modal works as expected
           townController.interactEnd(viewingArea);
         }}
-        size='full'>
+        size='6xl'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader fontFamily='heading' color='black' bg='white'>
