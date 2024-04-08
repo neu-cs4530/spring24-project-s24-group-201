@@ -78,13 +78,21 @@ export default function SelectVideoModal({
       setQueue(newQueue);
       fetchVideoTitles(newQueue); // Call fetchVideoTitles directly here if you prefer
     };
+    const handleVideoChange = (updatedVideo: string | undefined) => {
+      if (updatedVideo) {
+        setVideo(updatedVideo);
+      }
+      setIsBeginButtonVisible(false);
+    };
 
     // Subscribe to queueChange events
     viewingAreaController.addListener('queueChange', handleQueueChange);
+    viewingAreaController.addListener('videoChange', handleVideoChange);
 
     // Cleanup on component unmount or before re-running this effect
     return () => {
       viewingAreaController.removeListener('queueChange', handleQueueChange);
+      viewingAreaController.removeListener('videoChange', handleVideoChange);
     };
   }, [viewingAreaController]);
 
@@ -135,7 +143,6 @@ export default function SelectVideoModal({
   };
 
   const createViewingArea = useCallback(async () => {
-    setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
