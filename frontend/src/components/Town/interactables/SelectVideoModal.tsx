@@ -72,12 +72,28 @@ export default function SelectVideoModal({
     setVideoTitles(titles);
   };
 
+  useEffect(() => {
+    // Handler to update local state when queue changes
+    const handleQueueChange = (newQueue: string[]) => {
+      setQueue(newQueue);
+      fetchVideoTitles(newQueue); // Call fetchVideoTitles directly here if you prefer
+    };
+
+    // Subscribe to queueChange events
+    viewingAreaController.addListener('queueChange', handleQueueChange);
+
+    // Cleanup on component unmount or before re-running this effect
+    return () => {
+      viewingAreaController.removeListener('queueChange', handleQueueChange);
+    };
+  }, [viewingAreaController]);
+
   // Effect to fetch titles whenever the queue updates
   useEffect(() => {
-    if (viewingAreaController.queue && viewingAreaController.queue.length > 0) {
-      fetchVideoTitles(viewingAreaController.queue);
+    if (queue.length > 0) {
+      fetchVideoTitles(queue);
     }
-  }, [viewingAreaController.queue]);
+  }, [queue]);
 
   useEffect(() => {
     if (isOpen) {
