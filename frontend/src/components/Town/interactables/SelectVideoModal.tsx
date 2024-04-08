@@ -225,7 +225,6 @@ export default function SelectVideoModal({
                 mr={3}
                 onClick={() => {
                   setQueue(prevQueue => [...prevQueue, video]);
-                  fetchVideoTitles([...queue, video]);
                 }}>
                 <Icon as={IoIosAddCircle} boxSize={6} mr={2} />
                 Add to queue
