@@ -48,6 +48,60 @@ export default function SelectVideoModal({
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [queue, setQueue] = useState<string[]>(viewingArea?.defaultQueue);
   const [isBeginButtonVisible, setIsBeginButtonVisible] = useState(true);
+  const [videoTitles, setVideoTitles] = useState<string[]>([]);
+
+  // Function to fetch video titles by IDs
+  const fetchVideoTitles = async (currentQueue: string[]) => {
+    const titles = await Promise.all(
+      currentQueue.map(async videoId => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL}/api/youtube-video-info?url=${videoId}`,
+          );
+          if (!response.ok) {
+            throw new Error('Failed to fetch video title');
+          }
+          const data = await response.json();
+          return data.title || 'Unknown Title'; // Fallback title if not found
+        } catch (error) {
+          console.error('Error fetching video title:', error);
+          return 'Error fetching title';
+        }
+      }),
+    );
+    setVideoTitles(titles);
+  };
+
+  useEffect(() => {
+    // Handler to update local state when queue changes
+    const handleQueueChange = (newQueue: string[]) => {
+      setQueue(newQueue);
+      fetchVideoTitles(newQueue); // Call fetchVideoTitles directly here if you prefer
+    };
+    const handleVideoChange = (updatedVideo: string | undefined) => {
+      if (updatedVideo) {
+        setVideo(updatedVideo);
+      }
+      setIsBeginButtonVisible(false);
+    };
+
+    // Subscribe to queueChange events
+    viewingAreaController.addListener('queueChange', handleQueueChange);
+    viewingAreaController.addListener('videoChange', handleVideoChange);
+
+    // Cleanup on component unmount or before re-running this effect
+    return () => {
+      viewingAreaController.removeListener('queueChange', handleQueueChange);
+      viewingAreaController.removeListener('videoChange', handleVideoChange);
+    };
+  }, [viewingAreaController]);
+
+  // Effect to fetch titles whenever the queue updates
+  useEffect(() => {
+    if (queue.length > 0) {
+      fetchVideoTitles(queue);
+    }
+  }, [queue]);
 
   useEffect(() => {
     if (isOpen) {
@@ -89,7 +143,6 @@ export default function SelectVideoModal({
   };
 
   const createViewingArea = useCallback(async () => {
-    setIsBeginButtonVisible(false); // Hide the button when clicked
     const videoToPlay = queue.shift();
     const updatedQueue = [...queue];
     if (video && viewingAreaController) {
@@ -177,7 +230,9 @@ export default function SelectVideoModal({
                 ml={1}
                 colorScheme='blue'
                 mr={3}
-                onClick={() => setQueue(prevQueue => [...prevQueue, video])}>
+                onClick={() => {
+                  setQueue(prevQueue => [...prevQueue, video]);
+                }}>
                 <Icon as={IoIosAddCircle} boxSize={6} mr={2} />
                 Add to queue
               </Button>
@@ -217,9 +272,9 @@ export default function SelectVideoModal({
                 <AccordionPanel pb={4}>
                   <Box>
                     <UnorderedList aria-label='list of queue'>
-                      {queue.map(videoName => {
-                        return <ListItem key={videoName}>{videoName}</ListItem>;
-                      })}
+                      {videoTitles.map((title, index) => (
+                        <ListItem key={index}>{title}</ListItem>
+                      ))}
                     </UnorderedList>
                   </Box>
                 </AccordionPanel>

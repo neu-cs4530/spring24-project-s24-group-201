@@ -99,6 +99,16 @@ export function ViewingAreaVideo({
     };
   }, [controller]);
 
+  const skipVideo = () => {
+    if (controller.queue && controller.queue.length > 0) {
+      const newQueue = [...controller.queue]; // Clone the current queue from the controller
+      const nextVideo = newQueue.shift(); // Remove the first video from the cloned queue
+
+      controller.video = nextVideo; // Update the controller's video to the next in queue
+      controller.queue = newQueue; // Update the controller's queue
+    }
+  };
+
   return (
     <Accordion allowToggle defaultIndex={0}>
       <AccordionItem>
@@ -172,13 +182,7 @@ export function ViewingAreaVideo({
                 <Flex alignSelf='flex-end' mr={10} mt={2}>
                   <Box>
                     {controller.video && controller.queue.length !== 0 && (
-                      <Button
-                        colorScheme='purple'
-                        onClick={() => {
-                          controller.isPlaying = false;
-                          controller.video = queue.shift();
-                          setQueue([...queue]);
-                        }}>
+                      <Button colorScheme='purple' onClick={skipVideo}>
                         Skip Video
                         <Icon as={IoPlaySkipForwardSharp} boxSize={6} ml={1} />
                       </Button>
