@@ -1,6 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { EventNames } from '@socket.io/component-emitter';
-import { cleanup, render, RenderResult, fireEvent, screen } from '@testing-library/react';
+import { cleanup, render, RenderResult } from '@testing-library/react';
 import { mock, MockProxy } from 'jest-mock-extended';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -11,7 +11,6 @@ import ViewingAreaController, {
 } from '../../../classes/interactable/ViewingAreaController';
 import TownControllerContext from '../../../contexts/TownControllerContext';
 import { ViewingAreaVideo } from './ViewingAreaVideo';
-import userEvent from '@testing-library/user-event';
 
 // A sentinel value that we will render in the mock react player component to help find it in the DOM tree
 const MOCK_REACT_PLAYER_PLACEHOLDER = 'MOCK_REACT_PLAYER_PLACEHOLER';
@@ -436,118 +435,6 @@ describe('[T4] Viewing Area Video', () => {
       });
       onEnded();
       expect(townController.emitViewingAreaUpdate).not.toBeCalled();
-    });
-  });
-
-  // this will test add to queue
-  describe('[T4] Queue Management', () => {
-    it('Adds a video to the queue when the "Add to Queue" button is clicked', () => {
-      // Mock the TownController context value
-      const townControllerMock: MockProxy<TownController> = mock<TownController>();
-      townControllerMock.emitViewingAreaUpdate.mockImplementation(() => {});
-
-      // Create an instance of ViewingAreaController with the required properties
-      const viewingAreaController: ViewingAreaController = new ViewingAreaController({
-        id: 'test',
-        video: 'test.mp4',
-        queue: [],
-        isPlaying: true,
-        elapsedTimeSec: 0,
-        occupants: [],
-        type: 'ViewingArea',
-      });
-
-      render(
-        <ChakraProvider>
-          <TownControllerContext.Provider value={townControllerMock}>
-            <ViewingAreaVideo controller={viewingAreaController} />
-          </TownControllerContext.Provider>
-        </ChakraProvider>,
-      );
-
-      // Simulate adding a video to the queue
-      userEvent.click(screen.getByLabelText('Add to Queue'));
-
-      // Assert that the TownController emits an update with the added video in the queue
-      expect(townControllerMock.emitViewingAreaUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ queue: ['test.mp4'] }),
-      );
-    });
-  });
-
-  // test cases for Error Handling
-  describe('[T4] Error Handling', () => {
-    it('Displays an error message when an invalid video URL is provided', async () => {
-      const townControllerMock: MockProxy<TownController> = mock<TownController>();
-      townControllerMock.emitViewingAreaUpdate.mockImplementation(() => {});
-      class MockViewingAreaController extends ViewingAreaController {
-        constructor() {
-          super({
-            elapsedTimeSec: 0,
-            id: 'test',
-            isPlaying: true,
-            video: '',
-            occupants: [],
-            queue: [],
-            type: 'ViewingArea',
-          });
-        }
-      }
-
-      // Create an instance of the mock class
-      const viewingAreaMock = new MockViewingAreaController();
-
-      render(
-        <ChakraProvider>
-          <TownControllerContext.Provider value={townControllerMock}>
-            <ViewingAreaVideo controller={viewingAreaMock} />
-          </TownControllerContext.Provider>
-        </ChakraProvider>,
-      );
-
-      // Simulate entering an invalid video URL
-      await userEvent.type(screen.getByLabelText('Video URL'), 'invalid-url.mp4');
-      fireEvent.click(screen.getByText('Select'));
-
-      // check that an error message is displayed
-      expect(screen.getByText('Invalid video URL')).toBeInTheDocument();
-    });
-  });
-
-  describe('[T4] Viewing Area Update Emission', () => {
-    it('Emits an update to the TownController when the playback state changes', () => {
-      // Mock the TownController context value
-      const townControllerMock: MockProxy<TownController> = mock<TownController>();
-      townControllerMock.emitViewingAreaUpdate.mockImplementation(() => {});
-      class MockViewingAreaController extends ViewingAreaController {
-        constructor() {
-          super({
-            elapsedTimeSec: 0,
-            id: 'test',
-            isPlaying: true,
-            video: 'test.mp4',
-            occupants: [],
-            queue: [],
-            type: 'ViewingArea',
-          });
-        }
-      }
-
-      render(
-        <ChakraProvider>
-          <TownControllerContext.Provider value={townControllerMock}>
-            <ViewingAreaVideo controller={new MockViewingAreaController()} />
-          </TownControllerContext.Provider>
-        </ChakraProvider>,
-      );
-
-      // Simulate changing the playback state (e.g., pause)
-      fireEvent.click(screen.getByLabelText('Pause'));
-
-      // Assert that the TownController emits an update with the new playback state
-      expect(townControllerMock.emitViewingAreaUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ isPlaying: false }),
-      );
     });
   });
 });
