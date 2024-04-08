@@ -25,9 +25,11 @@ describe('[T2] ViewingAreaController', () => {
     mockClear(mockListeners.playbackChange);
     mockClear(mockListeners.progressChange);
     mockClear(mockListeners.videoChange);
+    mockClear(mockListeners.queueChange);
     testArea.addListener('playbackChange', mockListeners.playbackChange);
     testArea.addListener('progressChange', mockListeners.progressChange);
     testArea.addListener('videoChange', mockListeners.videoChange);
+    testArea.addListener('queueChange', mockListeners.queueChange);
   });
   describe('Setting video property', () => {
     it('updates the property and emits a videoChange event if the property changes', () => {
@@ -66,6 +68,19 @@ describe('[T2] ViewingAreaController', () => {
       expect(mockListeners.playbackChange).not.toBeCalled();
     });
   });
+  describe('Setting queue property', () => {
+    it('updates the model and emits a queueChange event if the property changes', () => {
+      const newValue = ['nanoid()', 'nanoid()'];
+      testArea.queue = newValue;
+      expect(mockListeners.queueChange).toBeCalledWith(newValue);
+      expect(testArea.queue).toEqual(newValue);
+    });
+    it('does not emit a queueChange event if the queue property does not change', () => {
+      const existingValue = testAreaModel.queue;
+      testArea.queue = existingValue;
+      expect(mockListeners.queueChange).not.toBeCalled();
+    });
+  });
   describe('viewingAreaModel', () => {
     it('Carries through all of the properties', () => {
       const model = testArea.toInteractableAreaModel();
@@ -87,7 +102,9 @@ describe('[T2] ViewingAreaController', () => {
       expect(testArea.video).toEqual(newModel.video);
       expect(testArea.elapsedTimeSec).toEqual(newModel.elapsedTimeSec);
       expect(testArea.isPlaying).toEqual(newModel.isPlaying);
+      expect(testArea.queue).toEqual(newModel.queue);
       expect(mockListeners.videoChange).toBeCalledWith(newModel.video);
+      expect(mockListeners.queueChange).toBeCalledWith(newModel.queue);
       expect(mockListeners.progressChange).toBeCalledWith(newModel.elapsedTimeSec);
       expect(mockListeners.playbackChange).toBeCalledWith(newModel.isPlaying);
     });

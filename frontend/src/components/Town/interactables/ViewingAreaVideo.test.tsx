@@ -106,7 +106,7 @@ describe('[T4] Viewing Area Video', () => {
       isPlaying: true,
       video: 'test',
       occupants: [],
-      queue: [],
+      queue: ['test1', 'test2'],
       type: 'ViewingArea',
     });
 
@@ -179,15 +179,38 @@ describe('[T4] Viewing Area Video', () => {
   describe('[T4] Bridging events from the ViewingAreaController to the ReactPlayer', () => {
     describe('Registering ViewingAreaController listeners', () => {
       describe('When rendered', () => {
+        it('Registers exactly one videoChange listener', () => {
+          act(() => {
+            viewingArea.emit('videoChange', '');
+          });
+          act(() => {
+            viewingArea.emit('videoChange', '');
+          });
+          act(() => {
+            viewingArea.emit('videoChange', '');
+          });
+          act(() => {
+            viewingArea.emit('videoChange', '');
+          });
+          getSingleListenerAdded('videoChange');
+        });
+        it('Removes the videoChange listener at unmount', () => {
+          act(() => {
+            viewingArea.emit('videoChange', '');
+          });
+          const listenerAdded = getSingleListenerAdded('videoChange');
+          cleanup();
+          expect(getSingleListenerRemoved('videoChange')).toBe(listenerAdded);
+        });
         it('Registers exactly one progressChange listener', () => {
           act(() => {
-            viewingArea.emit('playbackChange', false);
+            viewingArea.emit('progressChange', 10);
           });
           act(() => {
-            viewingArea.emit('playbackChange', true);
+            viewingArea.emit('progressChange', 5);
           });
           act(() => {
-            viewingArea.emit('playbackChange', false);
+            viewingArea.emit('progressChange', 400);
           });
           getSingleListenerAdded('progressChange');
         });
@@ -222,11 +245,36 @@ describe('[T4] Viewing Area Video', () => {
           cleanup();
           expect(getSingleListenerRemoved('playbackChange')).toBe(listenerAdded);
         });
+        it('Registers exactly one queueChange listener', () => {
+          act(() => {
+            viewingArea.emit('queueChange', []);
+          });
+          act(() => {
+            viewingArea.emit('queueChange', []);
+          });
+          act(() => {
+            viewingArea.emit('queueChange', []);
+          });
+          act(() => {
+            viewingArea.emit('queueChange', []);
+          });
+          getSingleListenerAdded('queueChange');
+        });
+        it('Removes the queueChange listener at unmount', () => {
+          act(() => {
+            viewingArea.emit('queueChange', []);
+          });
+          const listenerAdded = getSingleListenerAdded('queueChange');
+          cleanup();
+          expect(getSingleListenerRemoved('queueChange')).toBe(listenerAdded);
+        });
       });
       describe('When re-rendered with a different viewing area controller', () => {
         it('Removes the listeners on the old viewing area controller and adds listeners to the new controller', () => {
           const origPlayback = getSingleListenerAdded('playbackChange');
           const origProgress = getSingleListenerAdded('progressChange');
+          const origQueue = getSingleListenerAdded('queueChange');
+          const origVideo = getSingleListenerAdded('videoChange');
 
           const newViewingArea = new ViewingAreaController({
             elapsedTimeSec: 0,
@@ -242,9 +290,13 @@ describe('[T4] Viewing Area Video', () => {
 
           expect(getSingleListenerRemoved('playbackChange')).toBe(origPlayback);
           expect(getSingleListenerRemoved('progressChange')).toBe(origProgress);
+          expect(getSingleListenerRemoved('queueChange')).toBe(origQueue);
+          expect(getSingleListenerRemoved('videoChange')).toBe(origVideo);
 
           getSingleListenerAdded('playbackChange', newAddListenerSpy);
           getSingleListenerAdded('progressChange', newAddListenerSpy);
+          getSingleListenerAdded('queueChange', newAddListenerSpy);
+          getSingleListenerAdded('videoChange', newAddListenerSpy);
         });
       });
     });
