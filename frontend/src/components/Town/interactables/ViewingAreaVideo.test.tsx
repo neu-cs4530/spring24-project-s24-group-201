@@ -1,7 +1,9 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { EventNames } from '@socket.io/component-emitter';
 import { cleanup, render, RenderResult } from '@testing-library/react';
+import * as ChatChannel from './ChatChannel';
 import { mock, MockProxy } from 'jest-mock-extended';
+import { fireEvent } from '@testing-library/react';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import * as ReactPlayer from 'react-player';
@@ -166,6 +168,7 @@ describe('[T4] Viewing Area Video', () => {
     }
     return removedListeners[0][1] as unknown as ViewingAreaEvents[Ev];
   }
+
   describe('[T4] ReactPlayer rendering', () => {
     it('Sets the videoURL', () => {
       const props = firstReactPlayerConstructorProps();
@@ -435,6 +438,100 @@ describe('[T4] Viewing Area Video', () => {
       });
       onEnded();
       expect(townController.emitViewingAreaUpdate).not.toBeCalled();
+    });
+  });
+
+  describe('[T4] Skip Button Functionality', () => {
+    let newSkipButton: HTMLElement;
+    it('Skips the video when clicked', () => {
+      newSkipButton = renderData.getByText('Skip Video');
+
+      // Verify the type and everything is the same as defined above
+      expect(viewingArea.type).toBe('Viewing Area');
+      expect(viewingArea.isPlaying).toBe(true);
+      expect(viewingArea.video).toBe('test');
+      expect(viewingArea.queue).toEqual(['test1', 'test2']);
+
+      // Simulate someone clicking skip
+      fireEvent.click(newSkipButton);
+
+      // We should not be playing a video when we skip
+      expect(viewingArea.isPlaying).toBe(false);
+
+      // Ensure that the video in the queue is set as the new video
+      expect(viewingArea.video).toBe('test1');
+
+      // Ensure that the queue is updated to the next video
+      expect(viewingArea.queue).toEqual(['test2']);
+    });
+  });
+
+  describe('[T4] LikeButton Functionality', () => {
+    let likeButton: HTMLElement;
+
+    it('LikeButton is not defined', () => {
+      const verifyButton = renderData.queryByTestId('Like');
+      expect(verifyButton).toBeNull();
+    });
+
+    it('LikeButton is now defined and clicked', async () => {
+      // verifies the mock video is playing
+      expect(viewingArea.video != undefined).toBe(true);
+      expect(viewingArea.video).toBe('test');
+      expect(viewingArea.type).toBe('Viewing Area');
+      expect(viewingArea.isPlaying).toBe(true);
+
+      // now feed a new video
+      viewingArea.video = 'test?v=_LoDzVvBVpQ';
+
+      likeButton = renderData.getByTestId('Like');
+      expect(renderData.getByTestId('Like')).toBeDefined();
+
+      // Verify video is the same as defined above
+      expect(viewingArea.video).toBe('test?v=_LoDzVvBVpQ');
+
+      // Simulate clicking skip
+      fireEvent.click(likeButton);
+
+      // Now that we click like button we check that the same video is playing as above and that the video doesn't stop playing
+      expect(viewingArea.video).toBe('test?v=_LoDzVvBVpQ');
+      expect(viewingArea.type).toBe('Viewing Area');
+      expect(viewingArea.isPlaying).toBe(true);
+    });
+  });
+
+  describe('[T4] Rendering Chat', () => {
+    const chatChannelSpy = jest.spyOn(ChatChannel, 'default');
+    it('Renders a ChatChannel with the interactableID', () => {
+      renderViewingArea(viewingArea, townController);
+      expect(chatChannelSpy).toHaveBeenCalledWith(
+        {
+          interactableID: viewingArea.id,
+        },
+        {},
+      );
+    });
+    it('Re-renders the ChatChannel when the interactableID changes', () => {
+      expect(chatChannelSpy).toHaveBeenCalledWith(
+        {
+          interactableID: viewingArea.id,
+        },
+        {},
+      );
+      renderData.rerender(
+        <ChakraProvider>
+          <TownControllerContext.Provider value={townController}>
+            <ViewingAreaVideo controller={viewingArea} />
+          </TownControllerContext.Provider>
+        </ChakraProvider>,
+      );
+
+      expect(chatChannelSpy).toHaveBeenCalledWith(
+        {
+          interactableID: viewingArea.id,
+        },
+        {},
+      );
     });
   });
 });

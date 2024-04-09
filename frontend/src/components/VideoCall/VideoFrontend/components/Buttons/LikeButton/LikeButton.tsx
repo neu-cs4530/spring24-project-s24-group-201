@@ -41,6 +41,7 @@ export default function ToggleLikeButton(props: { videoID?: string, user?: strin
     <ChakraProvider theme={customTheme}>
       <Button
         onClick={handleLikeToggle}
+        data-testid='Like'
         leftIcon={isVideoLiked ? <FilledHeartIcon /> : <HeartIcon />}
         colorScheme='customGray'
         color='white'
