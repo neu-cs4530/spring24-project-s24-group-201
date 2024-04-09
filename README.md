@@ -52,40 +52,31 @@ You will also need to add a firebase API key: `FIREBASE_API_KEY` to connect to f
 In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
 The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
 
-Once you have followed these steps, open up localhost:3000 and follow steps 2-15 below!
+Once you have followed these steps, open up localhost:3000 and follow steps below (you can skip logging into to on render)!
 
+### On Render
 
 Follow these steps to run on render: 
 Log into our render at: https://spring24-project-s24-group-201.onrender.com/
-Create a fun username and a town
-You should spawn into the Basement TV Area. If not, please move your character to the area
+
+Create a fun username and a town. You should spawn into the Basement TV Area. If not, please move your character to the area
 You should see our new lounge at the top right.
-
-
 
 Now walk onto the grey carpet and you will see a message in black that says “Press Space to watch the YT Watch Party video”
 Before clicking “space” let's add some friends. In this example, we see Kamran is friends with Ankit and Ehsen isn’t a friend. In our Active Area Ehsen is not able to join the party. 
 Once you press “space” you will be greeted with our Welcome Page. All players have to press space to be in the viewing area.
 
-
-
-
 Now type anything you want to watch on youtube then click the Search button! For this demo let's watch something about brownies.
 
 Once the button is pressed, a new dropdown appears. Please click the dropdown and you will be given the Top 5 videos for your topic. 
 
-
 Select any of the videos, then press “Add to queue.” Any player can add to the queue and everyone can watch the same video.
-
 
 Once you add to the queue, you will see a new button pop up called “Start Watch Party”. Before we click that, let's add some other videos, such as cookies. Here we can see an interactive queue for the videos that we want. The first link is the brownie and the second is the cookie video I chose. Now lets press “Start Watch Party” to begin!
 
 Now look at the bottom, your video will appear.
 
-
-
 Whenever you get tired of a video, press “Skip Video” and the next video in the queue will play or if you want to watch the whole video through, go ahead! The next video about cookies will be ready to play after the brownie video finishes. Feel free to chat with whomever is in your Watch Party, as you have the ability to chat with friends. 
 Since I have nothing else in the queue, the “Skip Button” disappears and here we see that someone has already liked the video. I can press “Like” again and the amount will increase. 
 
-Feel free to hop in and out of the watch party. 
-
+Feel free to hop in and out of the watch party.
