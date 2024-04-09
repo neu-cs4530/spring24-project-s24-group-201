@@ -63,8 +63,7 @@ Create a fun username and a town. You should spawn into the Basement TV Area. If
 You should see our new lounge at the top right.
 
 Now walk onto the grey carpet and you will see a message in black that says “Press Space to watch the YT Watch Party video”
-Before clicking “space” let's add some friends. In this example, we see Kamran is friends with Ankit and Ehsen isn’t a friend. In our Active Area Ehsen is not able to join the party. 
-Once you press “space” you will be greeted with our Welcome Page. All players have to press space to be in the viewing area.
+Before clicking “space” you can add some friends, using the add friend functionality.
 
 Now type anything you want to watch on youtube then click the Search button! For this demo let's watch something about brownies.
 
@@ -77,6 +76,4 @@ Once you add to the queue, you will see a new button pop up called “Start Watc
 Now look at the bottom, your video will appear.
 
 Whenever you get tired of a video, press “Skip Video” and the next video in the queue will play or if you want to watch the whole video through, go ahead! The next video about cookies will be ready to play after the brownie video finishes. Feel free to chat with whomever is in your Watch Party, as you have the ability to chat with friends. 
-Since I have nothing else in the queue, the “Skip Button” disappears and here we see that someone has already liked the video. I can press “Like” again and the amount will increase. 
-
-Feel free to hop in and out of the watch party.
+Since I have nothing else in the queue, the “Skip Button” disappears and here we see that someone has already liked the video. I can press “Like” again and the amount will increase.
