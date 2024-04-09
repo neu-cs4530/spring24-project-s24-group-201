@@ -173,6 +173,7 @@ export function ViewingAreaVideo({
                   <Box>
                     {controller.video && controller.queue.length !== 0 && (
                       <Button
+                        data-testid='Skip Video'
                         colorScheme='purple'
                         onClick={() => {
                           controller.isPlaying = false;
@@ -187,6 +188,7 @@ export function ViewingAreaVideo({
                   <Box ml={1}>
                     {controller.video && controller.video.includes('v=') && (
                       <ToggleLikeButton
+                        data-testid='Like'
                         videoID={controller.video.split('v=')[1].split('&')[0]}
                         user={townController.userID}
                       />
