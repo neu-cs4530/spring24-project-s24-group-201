@@ -67,6 +67,36 @@ export function ViewingAreaVideo({
   const [queue, setQueue] = useState<string[]>(controller.queue || []);
   const townController = useTownController();
   const reactPlayerRef = useRef<ReactPlayer>(null);
+  const [videoTitles, setVideoTitles] = useState<string[]>([]);
+
+  // Function to fetch video titles by IDs
+  const fetchVideoTitles = async (currentQueue: string[]) => {
+    const titles = await Promise.all(
+      currentQueue.map(async videoId => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL}/api/youtube-video-info?url=${videoId}`,
+          );
+          if (!response.ok) {
+            throw new Error('Failed to fetch video title');
+          }
+          const data = await response.json();
+          return data.title || 'Unknown Title'; // Fallback title if not found
+        } catch (error) {
+          console.error('Error fetching video title:', error);
+          return 'Error fetching title';
+        }
+      }),
+    );
+    setVideoTitles(titles);
+  };
+
+  // Effect to fetch titles whenever the queue updates
+  useEffect(() => {
+    if (controller.queue && controller.queue.length > 0) {
+      fetchVideoTitles(controller.queue);
+    }
+  }, [controller.queue]);
 
   useEffect(() => {
     const progressListener = (newTime: number) => {
@@ -125,9 +155,9 @@ export function ViewingAreaVideo({
                   <Box>
                     <UnorderedList aria-label='list of queue'>
                       {/* Map through queue to display each video */}
-                      {queue.map(videoName => {
-                        return <ListItem key={videoName}>{videoName}</ListItem>;
-                      })}
+                      {videoTitles.map((title, index) => (
+                        <ListItem key={index}>{title}</ListItem>
+                      ))}
                     </UnorderedList>
                   </Box>
                 </AccordionPanel>
