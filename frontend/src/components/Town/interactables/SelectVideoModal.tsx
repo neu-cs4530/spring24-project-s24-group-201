@@ -19,7 +19,7 @@ import ViewingAreaController from '../../../classes/interactable/ViewingAreaCont
 import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import ViewingArea from './ViewingArea';
-import { MdPlayCircleFilled, MdMenu } from 'react-icons/md';
+import { MdPlayCircleFilled } from 'react-icons/md';
 import { IoIosAddCircle } from 'react-icons/io';
 import { FaSearch } from 'react-icons/fa';
 
