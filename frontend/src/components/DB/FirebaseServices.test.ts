@@ -5,6 +5,7 @@ import db, {
   countLikes,
   doesUserLikeVideo,
   sendFriendRequest,
+  areUsersFriends,
 } from './FirebaseServices';
 import {
   getDocs,
@@ -28,28 +29,55 @@ describe('Firebase Services - Likes', () => {
       const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;
       mockGetDocs.mockResolvedValueOnce({ empty: false } as never);
 
-      await expect(doesVideoExist('video123')).resolves.toBe(true);
+      await expect(doesVideoExist('video')).resolves.toBe(true);
     });
 
     it('returns false if the video does not exist', async () => {
       const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;
       mockGetDocs.mockResolvedValueOnce({ empty: true } as never);
 
-      await expect(doesVideoExist('videoXYZ')).resolves.toBe(false);
+      await expect(doesVideoExist('video')).resolves.toBe(false);
     });
   });
 
   describe('addLikeToVideo', () => {
     it('adds a like to an existing video', async () => {
-      const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;
+      jest.mocked(doc).mockReturnValue({} as never);
+      const mockGetDocs = jest.mocked(getDocs);
       mockGetDocs.mockResolvedValueOnce({ empty: false } as never);
-      const mockUpdateDoc = updateDoc as jest.MockedFunction<typeof updateDoc>;
+      const mockUpdateDoc = jest.mocked(updateDoc);
+      mockUpdateDoc.mockResolvedValueOnce(undefined); // Simulate success
 
       await addLikeToVideo('video123', 'user456');
       expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), {
         users: arrayUnion('user456'),
       });
     });
+    it('creates a new document and adds a like for a non-existent video', async () => {
+      jest.mocked(doc).mockReturnValue({} as never);
+      const mockGetDocs = jest.mocked(getDocs);
+      mockGetDocs.mockResolvedValueOnce({ empty: true } as never); // Video does not exist
+      const mockSetDoc = jest.mocked(setDoc);
+
+      await addLikeToVideo('newVideo', 'newUser');
+      expect(mockSetDoc).toHaveBeenCalledWith(expect.anything(), {
+        videoID: 'newVideo',
+        users: ['newUser'],
+      });
+    });
+    // it('does not add a duplicate like if the user already liked the video', async () => {
+    //   jest.mocked(getDocs).mockResolvedValueOnce({ empty: false } as never); // Simulate video exists
+    //   jest.mocked(getDoc).mockResolvedValueOnce({
+    //     exists: () => true,
+    //     data: () => ({ users: ['user456'] }),
+    //   } as never); // Simulate user already liked the video
+
+    //   await addLikeToVideo('video123', 'user456');
+    //   // Verify updateDoc is not called with arrayUnion for an already existing user
+    //   expect(jest.mocked(updateDoc)).not.toHaveBeenCalledWith(expect.anything(), {
+    //     users: arrayUnion('user456'),
+    //   });
+    // });
   });
 
   describe('doesUserLikeVideo', () => {
@@ -115,6 +143,10 @@ describe('Firebase Services - Likes', () => {
       await expect(countLikes('video123')).resolves.toBe(0);
     });
   });
+  it('handles Firestore service errors', async () => {
+    jest.mocked(getDocs).mockRejectedValueOnce(new Error('Firestore service unavailable'));
+    await expect(doesVideoExist('video123')).rejects.toThrow('Firestore service unavailable');
+  });
 });
 
 describe('Firebase Services - Friends', () => {
@@ -132,15 +164,28 @@ describe('Firebase Services - Friends', () => {
   });
 
   describe('areUsersFriends', () => {
-    it('adds a like to an existing video', async () => {
-      const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;
-      mockGetDocs.mockResolvedValueOnce({ empty: false } as never);
-      const mockUpdateDoc = updateDoc as jest.MockedFunction<typeof updateDoc>;
-
-      await addLikeToVideo('video123', 'user456');
-      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), {
-        users: arrayUnion('user456'),
-      });
+    it('returns true if users are friends', async () => {
+      const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
+      mockGetDoc.mockResolvedValueOnce({
+        exists: () => true,
+      } as never);
+      await expect(areUsersFriends('user1', 'user2')).resolves.toBe(true);
+      expect(doc).toHaveBeenCalledWith(db, 'users', 'user1', 'friends', 'user2');
+    });
+    it('returns false if users are not friends', async () => {
+      const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
+      mockGetDoc.mockResolvedValueOnce({
+        exists: () => false,
+      } as never);
+      await expect(areUsersFriends('user1', 'user2')).resolves.toBe(false);
+      expect(doc).toHaveBeenCalledWith(db, 'users', 'user1', 'friends', 'user2');
+    });
+    it('checks friendship status with one or more invalid user IDs', async () => {
+      const mockGetDoc = jest.mocked(getDoc);
+      mockGetDoc.mockResolvedValueOnce({
+        exists: () => false,
+      } as never);
+      await expect(areUsersFriends('', 'validUserID')).resolves.toBe(false);
     });
   });
 });
