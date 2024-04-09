@@ -216,6 +216,7 @@ export function ViewingAreaVideo({
                           if (queue.length > 0) {
                             controller.video = queue.shift();
                             setQueue([...queue]);
+                            setVideoTitles([...videoTitles].slice(1));
                           }
                           townController.emitViewingAreaUpdate(controller);
                         }
@@ -235,6 +236,7 @@ export function ViewingAreaVideo({
                           controller.isPlaying = false;
                           controller.video = queue.shift();
                           setQueue([...queue]);
+                          setVideoTitles([...videoTitles].slice(1));
                         }}>
                         Skip Video
                         <Icon as={IoPlaySkipForwardSharp} boxSize={6} ml={1} />

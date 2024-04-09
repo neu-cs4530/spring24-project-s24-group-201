@@ -229,12 +229,3 @@ export default function SelectVideoModal({
     </Accordion>
   );
 }
-
-// //add videoURL to queue --
-// //remove videoURL from queue
-// //search for video
-// //change/update videoURL --
-// //begin playing video
-// //display search results
-// //selecting a video from search results and updating videoURL
-// //display queue
