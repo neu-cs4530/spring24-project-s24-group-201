@@ -65,15 +65,15 @@ You should see our new lounge at the top right.
 Now walk onto the grey carpet and you will see a message in black that says “Press Space to watch the YT Watch Party video”
 Before clicking “space” you can add some friends, using the add friend functionality.
 
-Now type anything you want to watch on youtube then click the Search button! For this demo let's watch something about brownies.
+Now type anything you want to watch on youtube then click the Search button!
 
 Once the button is pressed, a new dropdown appears. Please click the dropdown and you will be given the Top 5 videos for your topic. 
 
 Select any of the videos, then press “Add to queue.” Any player can add to the queue and everyone can watch the same video.
 
-Once you add to the queue, you will see a new button pop up called “Start Watch Party”. Before we click that, let's add some other videos, such as cookies. Here we can see an interactive queue for the videos that we want. The first link is the brownie and the second is the cookie video I chose. Now lets press “Start Watch Party” to begin!
+Once you add to the queue, you will see a new button pop up called “Start Watch Party”. You can add as many videos to the queue as you like. You can continue to add videos to the queue even after you hit "Start Watch Party". Now lets press “Start Watch Party” to begin!
 
 Now look at the bottom, your video will appear.
 
 Whenever you get tired of a video, press “Skip Video” and the next video in the queue will play or if you want to watch the whole video through, go ahead! The next video about cookies will be ready to play after the brownie video finishes. Feel free to chat with whomever is in your Watch Party, as you have the ability to chat with friends. 
-Since I have nothing else in the queue, the “Skip Button” disappears and here we see that someone has already liked the video. I can press “Like” again and the amount will increase.
+Since I have nothing else in the queue, the “Skip Button” disappears. I can press “Like” and the amount will increase.
