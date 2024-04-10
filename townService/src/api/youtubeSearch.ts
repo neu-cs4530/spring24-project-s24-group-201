@@ -25,14 +25,10 @@ router.get('/youtube-search', async (req, res) => {
     return res.status(400).send('Query parameter is required.');
   }
 
-  // Use the API key from the environment variable
   const apiKey = process.env.REACT_APP_YOUTUBE_API_KEY;
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(
     searchQuery,
   )}&key=${apiKey}`;
-
-  // Inside your API route or controller where you're making the fetch call
-  // Assuming you have already defined YouTubeApiResponse interface as mentioned before
 
   try {
     const youtubeResponse = await fetch(url);
@@ -40,9 +36,7 @@ router.get('/youtube-search', async (req, res) => {
       throw new Error('YouTube API returned an error.');
     }
 
-    // Use type assertion here
     const youtubeData = (await youtubeResponse.json()) as YouTubeApiResponse;
-
     return res.status(200).json(youtubeData);
   } catch (error) {
     return res.status(500).send('Internal Server Error');
