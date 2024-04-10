@@ -212,7 +212,7 @@ export default function SelectVideoModal({
               }}>
               <Box mt={4} textAlign='center'>
                 {/* Display begin watch party button */}
-                {viewingAreaController.video && isBeginButtonVisible && queue.length !== 0 && (
+                {!viewingAreaController.video && isBeginButtonVisible && queue.length !== 0 && (
                   <Button
                     colorScheme='green'
                     mr={3}
