@@ -16,6 +16,8 @@ import {
   ModalOverlay,
   Icon,
   Image,
+  ListItem,
+  UnorderedList,
 } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -27,6 +29,7 @@ import ViewingAreaInteractable from './ViewingArea';
 import ChatChannel from './ChatChannel';
 import ToggleLikeButton from '../../VideoCall/VideoFrontend/components/Buttons/LikeButton/LikeButton';
 import { IoPlaySkipForwardSharp } from 'react-icons/io5';
+import { MdMenu } from 'react-icons/md';
 
 const ALLOWED_DRIFT = 3;
 export class MockReactPlayer extends ReactPlayer {
@@ -107,6 +110,29 @@ export function ViewingAreaVideo({
           <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
+          <Box mt={4}>
+            <Accordion allowToggle defaultIndex={0}>
+              <AccordionItem>
+                <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
+                  <Box flex='1' alignItems='center' display='flex' textAlign='left'>
+                    <Icon as={MdMenu} boxSize={4} mr={2} alignSelf='center' />
+                    Queue
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4}>
+                  <Box>
+                    <UnorderedList aria-label='list of queue'>
+                      {console.log(queue)}
+                      {queue.map((title, index) => (
+                        <ListItem key={index}>{title}</ListItem>
+                      ))}
+                    </UnorderedList>
+                  </Box>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </Box>
           <Center>
             <Flex>
               <Flex direction='column'>
