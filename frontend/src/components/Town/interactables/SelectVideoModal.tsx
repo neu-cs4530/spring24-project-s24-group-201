@@ -226,28 +226,6 @@ export default function SelectVideoModal({
               </Box>
             </form>
           </Box>
-          <Box mt={4}>
-            <Accordion allowToggle defaultIndex={0}>
-              <AccordionItem>
-                <AccordionButton _expanded={{ bg: 'black', color: 'white' }} fontWeight='bold'>
-                  <Box flex='1' alignItems='center' display='flex' textAlign='left'>
-                    <Icon as={MdMenu} boxSize={4} mr={2} alignSelf='center' />
-                    Queue
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel pb={4}>
-                  <Box>
-                    <UnorderedList aria-label='list of queue'>
-                      {queue.map(videoName => {
-                        return <ListItem key={videoName}>{videoName}</ListItem>;
-                      })}
-                    </UnorderedList>
-                  </Box>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </Box>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
